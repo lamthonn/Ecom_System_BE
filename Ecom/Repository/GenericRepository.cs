@@ -24,6 +24,8 @@ namespace Ecom.Repository
         }
 
         // Phương thức hỗ trợ lọc dữ liệu bằng Expression
+        // GET /api/items?pageNumber=1&pageSize=10&keySearch={"name":"Nam hip","email":"abc@gmail.com"}
+
         private IQueryable<T> ApplySearchFilter(IQueryable<T> query, string propertyName, string value)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
