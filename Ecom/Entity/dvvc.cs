@@ -1,10 +1,10 @@
 ﻿using Ecom.Entity.common;
-
+using Ecom.Interfaces;
 namespace Ecom.Entity
 {
-    public class dvvc : BaseModel
+    public class dvvc : BaseModel, IEntity
     {
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         public string Name { get; set; }
     }
 }

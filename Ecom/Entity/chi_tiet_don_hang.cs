@@ -1,10 +1,11 @@
 ﻿using Ecom.Entity.common;
+using Ecom.Interfaces;
 
 namespace Ecom.Entity
 {
-    public class chi_tiet_don_hang : BaseModel
+    public class chi_tiet_don_hang : BaseModel, IEntity
     { 
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         public Guid don_hang_id { get; set; }
         public Guid san_pham_id { get; set; }
         public decimal thanh_tien { get; set; }

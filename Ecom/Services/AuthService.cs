@@ -43,7 +43,7 @@ namespace Ecom.Services
 
                 var newAccount = new account
                 {
-                    Id = Guid.NewGuid(),
+                    id = Guid.NewGuid(),
                     tai_khoan = request.tai_khoan,
                     mat_khau = hashPassword,
                     salt = Convert.ToBase64String(salt), // Lưu Salt vào CSDL
@@ -115,7 +115,7 @@ namespace Ecom.Services
                         {
                             var claims = new List<Claim> {
                                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
-                                new Claim("Id", user.Id.ToString()),
+                                new Claim("id", user.id.ToString()),
                                 new Claim("tai_khoan",user.tai_khoan),
                                 new Claim("role", user.is_super_admin.ToString()! )
                             };
@@ -209,7 +209,7 @@ namespace Ecom.Services
         {
             var claims = new List<Claim> {
         new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
-        new Claim("Id", user.Id.ToString()),
+        new Claim("id", user.id.ToString()),
         new Claim("tai_khoan", user.tai_khoan),
         new Claim("role", user.is_super_admin.ToString())
     };

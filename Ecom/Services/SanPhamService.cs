@@ -62,7 +62,7 @@ namespace Ecom.Services
 
                 var dataQueryDto = dataQuery.Select(x => new SanPhamDto
                 {
-                    Id = x.Id,
+                    Id = x.id,
                     ma_san_pham = x.ma_san_pham,
                     ten_san_pham = x.ten_san_pham,
                     mo_ta = x.mo_ta,

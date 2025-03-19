@@ -1,11 +1,12 @@
 ﻿using Ecom.Entity.common;
+using Ecom.Interfaces;
 using System.ComponentModel;
 
 namespace Ecom.Entity
 {
-    public class account : BaseModel
+    public class account : BaseModel, IEntity
     {
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         public string tai_khoan { get; set; }
         public string mat_khau { get; set; }
         public string? salt { get; set; }

@@ -1,8 +1,8 @@
 ﻿using Ecom.Entity.common;
-
+using Ecom.Interfaces;
 namespace Ecom.Entity
 {
-    public class don_hang : BaseModel
+    public class don_hang : BaseModel, IEntity
     {
         public Guid id { get; set; }
         public Guid account_id { get; set; }
