@@ -50,7 +50,7 @@ namespace Ecom.Services
                     CreatedBy = x.CreatedBy,
                 });
 
-                var result = PaginatedList<DanhMucDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
+                var result = await PaginatedList<DanhMucDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
                 return result;
             }
             catch (Exception ex)

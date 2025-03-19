@@ -74,7 +74,7 @@ namespace Ecom.Services
                     so_luong = dataQuery.Where(y => y.ma_san_pham == x.ma_san_pham).Sum(y => y.so_luong)
                 }).AsEnumerable().DistinctBy(x => x.ma_san_pham).AsQueryable();
 
-                var result = PaginatedList<SanPhamDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
+                var result = await PaginatedList<SanPhamDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
                 return result;
             }
             catch (Exception ex)

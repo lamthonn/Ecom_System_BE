@@ -295,3 +295,5 @@ E:\code\xay dung httmdt\xuan_lam\Ecom_System_BE\Ecom\obj\Debug\net8.0\refint\Eco
 E:\code\xay dung httmdt\xuan_lam\Ecom_System_BE\Ecom\obj\Debug\net8.0\Ecom.pdb
 E:\code\xay dung httmdt\xuan_lam\Ecom_System_BE\Ecom\obj\Debug\net8.0\Ecom.genruntimeconfig.cache
 E:\code\xay dung httmdt\xuan_lam\Ecom_System_BE\Ecom\obj\Debug\net8.0\ref\Ecom.dll
+E:\code\xay dung httmdt\xuan_lam\Ecom_System_BE\Ecom\bin\Debug\net8.0\AutoMapper.dll
+E:\code\xay dung httmdt\xuan_lam\Ecom_System_BE\Ecom\bin\Debug\net8.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll

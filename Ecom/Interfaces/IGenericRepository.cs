@@ -6,10 +6,10 @@ namespace Ecom.Interfaces
 {
     public interface IGenericRepository<T> where T : class, IEntity
     {
-        Task<PaginatedList<T>> GetAllAsync(PaginParams paginParams);
-        Task<T> GetByIdAsync(Guid id);
-        Task<T> AddAsync(T entity);
-        Task<bool> UpdateAsync(Guid id, T entity);
+        Task<PaginatedList<TDto>> GetAllAsync<TDto>(PaginParams paginParams);
+        Task<TDto> GetByIdAsync<TDto>(Guid id);
+        Task<TDto> AddAsync<TDto>(TDto dto);
+        Task<bool> UpdateAsync<TDto>(Guid id, TDto dto);
         Task<bool> DeleteAsync(Guid id);
     }
 }
