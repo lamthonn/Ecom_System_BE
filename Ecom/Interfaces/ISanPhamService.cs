@@ -7,13 +7,14 @@ namespace Ecom.Interfaces
     {
         public Task<PaginatedList<SanPhamDto>> GetAll(SanPhamDto request);
         public Task<SanPhamDto> GetById(string id);
-        public Task<SanPhamDto> create(SanPhamDto request);
+        public Task<List<SanPhamDto>> create(List<SanPhamDto> request);
         public void Edit(string id, SanPhamDto request);
         public void Delete(string id);
         public void DeleteAny(List<string> ids);
         public byte[] ExportToExcel();
         public Task<string> SaveImageFileCoverPhoto(IFormFile file);
         public Task<List<string>> SaveMutiImageFile(List<IFormFile> files);
+        public void AddListImage(List<string> filePath, string ma);
 
     }
 }

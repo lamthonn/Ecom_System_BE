@@ -1,4 +1,5 @@
-﻿using Azure.Core;
+﻿using AutoMapper;
+using Azure.Core;
 using backend_v3.Models;
 using Ecom.Context;
 using Ecom.Dto.QuanLySanPham;
@@ -14,17 +15,35 @@ namespace Ecom.Services
         private readonly AppDbContext _context;
         private readonly IWebHostEnvironment _env;
         private readonly SaveFileCommon _fileService;
+        private readonly IMapper _mapper;
 
-        public SanPhamService(AppDbContext context, IWebHostEnvironment env, SaveFileCommon fileService)
+        public SanPhamService(AppDbContext context, IWebHostEnvironment env, SaveFileCommon fileService, IMapper mapper)
         {
             _context = context;
             _env = env;
             _fileService = fileService;
+            _mapper = mapper;
         }
 
-        public async Task<SanPhamDto> create(SanPhamDto request)
+        public void AddListImage(List<string> filePath, string ma)
         {
-            throw new NotImplementedException();
+            var listData = new List<anh_san_pham>();
+            foreach (var item in filePath)
+            {
+                var data = new anh_san_pham
+                {
+                    id = Guid.NewGuid(),
+                    
+                };
+            }
+        }
+
+        public async Task<List<SanPhamDto>> create(List<SanPhamDto> request)
+        {
+            var newData = _mapper.Map<List<SanPhamDto>, List<san_pham>>(request);
+            _context.san_pham.AddRange(newData);
+            _context.SaveChanges();
+            return request;
         }
 
         public void Delete(string id)

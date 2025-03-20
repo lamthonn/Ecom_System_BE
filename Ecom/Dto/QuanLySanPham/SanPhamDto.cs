@@ -13,6 +13,7 @@ namespace Ecom.Dto.QuanLySanPham
         public int? luot_ban { get; set; }
         public int? so_luong { get; set; }
         public string? sku { get; set; }
+        public string? duong_dan_anh_bia { get; set; }
         public string? mau_sac { get; set; }
         public string? size { get; set; }
         public decimal? gia { get; set; }
