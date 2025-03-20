@@ -1,7 +1,10 @@
-﻿using backend_v3.Models;
+﻿using Azure.Core;
+using backend_v3.Models;
 using Ecom.Context;
 using Ecom.Dto.QuanLySanPham;
+using Ecom.Entity;
 using Ecom.Interfaces;
+using Ecom.Services.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Services
@@ -9,12 +12,17 @@ namespace Ecom.Services
     public class SanPhamService : ISanPhamService
     {
         private readonly AppDbContext _context;
-        public SanPhamService(AppDbContext context)
+        private readonly IWebHostEnvironment _env;
+        private readonly SaveFileCommon _fileService;
+
+        public SanPhamService(AppDbContext context, IWebHostEnvironment env, SaveFileCommon fileService)
         {
             _context = context;
+            _env = env;
+            _fileService = fileService;
         }
 
-        public Task<SanPhamDto> create(SanPhamDto request)
+        public async Task<SanPhamDto> create(SanPhamDto request)
         {
             throw new NotImplementedException();
         }
@@ -43,7 +51,7 @@ namespace Ecom.Services
         {
             try
             {
-                var dataQuery = _context.san_pham.AsNoTracking();
+                IQueryable<san_pham> dataQuery = _context.san_pham.AsNoTracking();
 
                 //if (!string.IsNullOrEmpty(request.ma_danh_muc))
                 //{
@@ -60,19 +68,21 @@ namespace Ecom.Services
                 //    dataQuery = dataQuery.Where(x => x.Created == request.Created);
                 //}
 
-                var dataQueryDto = dataQuery.Select(x => new SanPhamDto
+                var dataQueryDto = dataQuery
+                .GroupBy(x => x.ma_san_pham)
+                .Select(g => new SanPhamDto
                 {
-                    Id = x.id,
-                    ma_san_pham = x.ma_san_pham,
-                    ten_san_pham = x.ten_san_pham,
-                    mo_ta = x.mo_ta,
-                    danh_muc_id = x.danh_muc_id,
-                    is_active = x.is_active,
-                    xuat_xu = x.xuat_xu,
-                    gia = x.gia,
-                    khuyen_mai = x.khuyen_mai,
-                    so_luong = dataQuery.Where(y => y.ma_san_pham == x.ma_san_pham).Sum(y => y.so_luong)
-                }).AsEnumerable().DistinctBy(x => x.ma_san_pham).AsQueryable();
+                    Id = g.First().id,
+                    ma_san_pham = g.Key,
+                    ten_san_pham = g.First().ten_san_pham,
+                    mo_ta = g.First().mo_ta,
+                    danh_muc_id = g.First().danh_muc_id,
+                    is_active = g.First().is_active,
+                    xuat_xu = g.First().xuat_xu,
+                    gia = g.First().gia,
+                    khuyen_mai = g.First().khuyen_mai,
+                    so_luong = g.Sum(y => y.so_luong)
+                });
 
                 var result = await PaginatedList<SanPhamDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
                 return result;
@@ -86,6 +96,18 @@ namespace Ecom.Services
         public Task<SanPhamDto> GetById(string id)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<string> SaveImageFileCoverPhoto(IFormFile file)
+        {
+            string filePath = await _fileService.SaveImageFileCommon(file, "san_pham");
+            return filePath;
+        }
+
+        public async Task<List<string>> SaveMutiImageFile(List<IFormFile> files)
+        {
+            var filePath = await _fileService.SaveMultipleImageFilesCommon(files, "san_pham");
+            return filePath;
         }
     }
 }

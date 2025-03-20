@@ -15,6 +15,7 @@ namespace Ecom.Entity
         public string sku { get; set; }
         public string? mau_sac { get; set; }
         public string? size { get; set; }
+        public string? duong_dan_anh_bia { get; set; }
         public decimal? gia { get; set; }
         public decimal? khuyen_mai { get; set; }
         public bool? is_active { get; set; } = true;

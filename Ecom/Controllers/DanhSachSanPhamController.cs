@@ -26,5 +26,27 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
+
+        [HttpPost]
+        [Route("add-cover-image")]
+        public Task<string> AddCoverImage(IFormFile file)
+        {
+            try
+            {
+                return _service.SaveImageFileCoverPhoto(file);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+        
+        [HttpPost]
+        [Route("add-list-image")]
+        public Task<List<string>> AddListImage(List<IFormFile> files)
+        {
+            try
+            {
+                return _service.SaveMutiImageFile(files);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
     }
 }

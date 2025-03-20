@@ -12,5 +12,8 @@ namespace Ecom.Interfaces
         public void Delete(string id);
         public void DeleteAny(List<string> ids);
         public byte[] ExportToExcel();
+        public Task<string> SaveImageFileCoverPhoto(IFormFile file);
+        public Task<List<string>> SaveMutiImageFile(List<IFormFile> files);
+
     }
 }

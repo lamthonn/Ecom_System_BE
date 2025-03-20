@@ -9,6 +9,7 @@ using System.Text;
 using AutoMapper;
 using Ecom.Dto.ProductTest;
 using Ecom.AutoMapper;
+using Ecom.Services.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -42,6 +43,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IDanhMucSanPhamService, DanhMucSanPham>();
 builder.Services.AddTransient<ISanPhamService, SanPhamService>();
+builder.Services.AddTransient<SaveFileCommon>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
