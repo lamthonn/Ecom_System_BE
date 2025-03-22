@@ -35,9 +35,9 @@ namespace Ecom.Services
                     dataQuery = dataQuery.Where(x => x.ten_danh_muc.Contains(request.ten_danh_muc));
                 }
 
-                if (request.Created != null)
+                if (request.fromDate != null && request.toDate!= null)
                 {
-                    dataQuery = dataQuery.Where(x => x.Created == request.Created);
+                    dataQuery = dataQuery.Where(x => x.Created >= request.fromDate && x.Created <= request.toDate);
                 }
 
                 var dataQueryDto = dataQuery.Select(x => new DanhMucDto

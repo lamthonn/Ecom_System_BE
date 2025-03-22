@@ -10,6 +10,7 @@ using AutoMapper;
 using Ecom.Dto.ProductTest;
 using Ecom.AutoMapper;
 using Ecom.Services.Common;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -44,7 +45,6 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IDanhMucSanPhamService, DanhMucSanPham>();
 builder.Services.AddTransient<ISanPhamService, SanPhamService>();
 builder.Services.AddTransient<SaveFileCommon>();
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -93,7 +93,12 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "san_pham")),
+    RequestPath = "/san_pham"
+});
 app.MapControllers();
 
 app.Run();

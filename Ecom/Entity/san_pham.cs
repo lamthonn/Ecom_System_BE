@@ -20,5 +20,6 @@ namespace Ecom.Entity
         public decimal? khuyen_mai { get; set; }
         public bool? is_active { get; set; } = true;
         public virtual danh_muc? danh_Muc { get; set; }
+        public virtual ICollection<anh_san_pham>? ds_anh_san_pham { get; set; }
     }
 }

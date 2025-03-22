@@ -77,5 +77,13 @@ namespace Ecom.Services.Common
 
             return fileUrls;
         }
+
+        public bool checkDuplicateFile(IFormFile file)
+        {
+            // Kiểm tra trùng file dựa trên tên file
+            //var existingFile = _context.Files.FirstOrDefault(f => f.FileName == file.FileName);
+            //return existingFile != null;
+            return true;
+        }
     }
 }

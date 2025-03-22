@@ -17,6 +17,10 @@ namespace Ecom.AutoMapper
                 .ForMember(dest => dest.ma_san_pham_dto, opt => opt.MapFrom(src => src.ma_san_pham))
                 .ReverseMap();
 
+            CreateMap<san_pham, SanPhamDto>()
+                .ForMember(dest => dest.ds_anh_san_pham, opt => opt.MapFrom(src => src.ds_anh_san_pham!.Where(x=> x.ma_san_pham == src.ma_san_pham))); 
+            CreateMap<SanPhamDto, san_pham>();
+
 
             // Định nghĩa ánh xạ chung cho PaginatedList<T>
             CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>))
