@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using backend_v3.Models;
+using Ecom.Dto.KhachHang;
 using Ecom.Dto.ProductTest;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Entity;
@@ -17,6 +18,9 @@ namespace Ecom.AutoMapper
                 .ForMember(dest => dest.ma_san_pham_dto, opt => opt.MapFrom(src => src.ma_san_pham))
                 .ReverseMap();
 
+            // khách hàng
+            CreateMap<account, KhachHangDto>()
+                .ReverseMap();
 
             // Định nghĩa ánh xạ chung cho PaginatedList<T>
             CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>))
