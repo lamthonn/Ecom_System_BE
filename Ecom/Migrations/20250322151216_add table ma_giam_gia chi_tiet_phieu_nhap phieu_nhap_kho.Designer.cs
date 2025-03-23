@@ -4,6 +4,7 @@ using Ecom.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecom.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250322151216_add table ma_giam_gia chi_tiet_phieu_nhap phieu_nhap_kho")]
+    partial class addtablema_giam_giachi_tiet_phieu_nhapphieu_nhap_kho
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -264,36 +267,6 @@ namespace Ecom.Migrations
                     b.HasIndex("san_phamid");
 
                     b.ToTable("chi_tiet_phieu_nhap_kho");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.chuong_trinh_marketing", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("cong_cu")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ten")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("chuong_trinh_marketing");
                 });
 
             modelBuilder.Entity("Ecom.Entity.danh_gia", b =>

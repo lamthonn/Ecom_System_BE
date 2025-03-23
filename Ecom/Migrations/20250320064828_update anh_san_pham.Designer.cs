@@ -4,6 +4,7 @@ using Ecom.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecom.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250320064828_update anh_san_pham")]
+    partial class updateanh_san_pham
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,90 +215,6 @@ namespace Ecom.Migrations
                     b.ToTable("chi_tiet_gio_hang");
                 });
 
-            modelBuilder.Entity("Ecom.Entity.chi_tiet_phieu_nhap_kho", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("don_gia")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("ma_san_pham")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("phieu_nhap_kho_id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("phieu_nhap_khoid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("san_pham_id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("san_phamid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("sku")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("so_luong")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("phieu_nhap_khoid");
-
-                    b.HasIndex("san_phamid");
-
-                    b.ToTable("chi_tiet_phieu_nhap_kho");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.chuong_trinh_marketing", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("cong_cu")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ten")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("chuong_trinh_marketing");
-                });
-
             modelBuilder.Entity("Ecom.Entity.danh_gia", b =>
                 {
                     b.Property<Guid>("id")
@@ -490,99 +409,6 @@ namespace Ecom.Migrations
                     b.ToTable("gio_hang");
                 });
 
-            modelBuilder.Entity("Ecom.Entity.ma_giam_gia", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("bat_dau")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("giam_gia")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("is_active")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("ket_thuc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("so_luong")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ten")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("id");
-
-                    b.ToTable("ma_gia_gia");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.phieu_nhap_kho", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ghi_chu")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ma")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("ngay_du_kien")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("ngay_het_han")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("nha_cung_cap")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("thanh_tien")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("trang_thai")
-                        .HasColumnType("int");
-
-                    b.HasKey("id");
-
-                    b.ToTable("phieu_nhap_kho");
-                });
-
             modelBuilder.Entity("Ecom.Entity.san_pham", b =>
                 {
                     b.Property<Guid>("id")
@@ -704,7 +530,7 @@ namespace Ecom.Migrations
             modelBuilder.Entity("Ecom.Entity.anh_san_pham", b =>
                 {
                     b.HasOne("Ecom.Entity.san_pham", "san_Pham")
-                        .WithMany("ds_anh_san_pham")
+                        .WithMany()
                         .HasForeignKey("san_Phamid");
 
                     b.Navigation("san_Pham");
@@ -738,21 +564,6 @@ namespace Ecom.Migrations
                     b.Navigation("Gio_Hang");
 
                     b.Navigation("San_Pham");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.chi_tiet_phieu_nhap_kho", b =>
-                {
-                    b.HasOne("Ecom.Entity.phieu_nhap_kho", "phieu_nhap_kho")
-                        .WithMany("ds_chi_tiet_phieu_nhap_kho")
-                        .HasForeignKey("phieu_nhap_khoid");
-
-                    b.HasOne("Ecom.Entity.san_pham", "san_pham")
-                        .WithMany()
-                        .HasForeignKey("san_phamid");
-
-                    b.Navigation("phieu_nhap_kho");
-
-                    b.Navigation("san_pham");
                 });
 
             modelBuilder.Entity("Ecom.Entity.danh_gia", b =>
@@ -810,16 +621,6 @@ namespace Ecom.Migrations
                         .HasForeignKey("accountid");
 
                     b.Navigation("account");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.phieu_nhap_kho", b =>
-                {
-                    b.Navigation("ds_chi_tiet_phieu_nhap_kho");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.san_pham", b =>
-                {
-                    b.Navigation("ds_anh_san_pham");
                 });
 #pragma warning restore 612, 618
         }

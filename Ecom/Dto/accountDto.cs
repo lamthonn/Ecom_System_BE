@@ -18,4 +18,22 @@ namespace Ecom.Dto
         public DateTime? RefreshTokenExpiryTime { get; set; } // Hạn sử dụng của Refresh Token
         public bool is_super_admin { get; set; }
     }
+
+    public class UpdatePhoneDto
+    {
+        public string so_dien_thoai { get; set; } = string.Empty;
+    }
+
+    // DTO cho cập nhật email
+    public class UpdateEmailDto
+    {
+        public string email { get; set; } = string.Empty;
+    }
+
+    // DTO cho cập nhật mật khẩu
+    public class UpdatePasswordDto
+    {
+        public string oldPassword { get; set; } = string.Empty;
+        public string newPassword { get; set; } = string.Empty;
+    }
 }

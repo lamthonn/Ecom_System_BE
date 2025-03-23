@@ -4,8 +4,12 @@ using backend_v3.Models;
 using Ecom.Context;
 using Ecom.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using OfficeOpenXml.Style;
+using OfficeOpenXml;
 using System.Linq.Expressions;
+using Ecom.Dto.Common;
 
 namespace Ecom.Repository
 {
@@ -89,6 +93,7 @@ namespace Ecom.Repository
             if (existingEntity == null) return false;
 
             _mapper.Map(dto, existingEntity);
+            _context.Entry(existingEntity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -101,6 +106,121 @@ namespace Ecom.Repository
             _dbSet.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> DeleteMultipleAsync(List<Guid> ids)
+        {
+            if (ids == null || !ids.Any())
+            {
+                return false; // Không có ID nào để xóa
+            }
+
+            try
+            {
+                // Tìm tất cả các bản ghi có ID nằm trong danh sách ids
+                var entities = await _dbSet
+                    .Where(e => ids.Contains(e.id))
+                    .ToListAsync();
+
+                if (!entities.Any())
+                {
+                    return false; // Không tìm thấy bản ghi nào để xóa
+                }
+
+                // Xóa các bản ghi
+                _dbSet.RemoveRange(entities);
+
+                // Lưu thay đổi vào cơ sở dữ liệu
+                int changes = await _context.SaveChangesAsync();
+                return changes > 0; // Trả về true nếu có ít nhất 1 bản ghi được xóa
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi xóa nhiều bản ghi: {ex.Message}");
+                return false;
+            }
+        }
+        public byte[] ExportToExcelDynamic<TData>(IEnumerable<TData> data, List<ExcelColumnDto> columns, string sheetName = "Sheet1")
+        {
+            if (data == null || !data.Any())
+            {
+                throw new ArgumentException("Dữ liệu đầu vào không được rỗng.");
+            }
+
+            if (columns == null || !columns.Any())
+            {
+                throw new ArgumentException("Danh sách cột không được rỗng.");
+            }
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add(sheetName);
+
+                // Tiêu đề cột
+                worksheet.Cells[1, 1].Value = "STT";
+                for (int i = 0; i < columns.Count; i++)
+                {
+                    worksheet.Cells[1, i + 2].Value = columns[i].DisplayName;
+                }
+
+                // Định dạng tiêu đề
+                using (var range = worksheet.Cells[1, 1, 1, columns.Count + 1])
+                {
+                    range.Style.Font.Bold = true;
+                    range.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    range.Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                    range.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+
+                // Ghi dữ liệu vào file Excel
+                int row = 2;
+                int stt = 1;
+                foreach (var item in data)
+                {
+                    worksheet.Cells[row, 1].Value = stt; // Số thứ tự
+
+                    // Ghi giá trị cho từng cột
+                    for (int i = 0; i < columns.Count; i++)
+                    {
+                        var column = columns[i];
+                        var propertyInfo = item.GetType().GetProperty(column.PropertyName);
+                        if (propertyInfo != null)
+                        {
+                            var value = propertyInfo.GetValue(item);
+                            if (value != null)
+                            {
+                                // Nếu có định dạng (ví dụ: cho ngày tháng), áp dụng định dạng
+                                if (!string.IsNullOrEmpty(column.Format) && value is DateTime dateValue)
+                                {
+                                    worksheet.Cells[row, i + 2].Value = dateValue.ToString(column.Format);
+                                }
+                                else
+                                {
+                                    worksheet.Cells[row, i + 2].Value = value;
+                                }
+                            }
+                            else
+                            {
+                                worksheet.Cells[row, i + 2].Value = string.Empty;
+                            }
+                        }
+                        else
+                        {
+                            worksheet.Cells[row, i + 2].Value = string.Empty;
+                            Console.WriteLine($"Thuộc tính {column.PropertyName} không tồn tại trong dữ liệu.");
+                        }
+                    }
+
+                    row++;
+                    stt++;
+                }
+
+                // Auto-fit cột
+                worksheet.Cells.AutoFitColumns();
+
+                return package.GetAsByteArray();
+            }
         }
     }
 

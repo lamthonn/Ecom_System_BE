@@ -1,5 +1,6 @@
 ﻿using backend_v3.Dto.Common;
 using backend_v3.Models;
+using Ecom.Dto.Common;
 using System.Security.Principal;
 
 namespace Ecom.Interfaces
@@ -11,5 +12,8 @@ namespace Ecom.Interfaces
         Task<TDto> AddAsync<TDto>(TDto dto);
         Task<bool> UpdateAsync<TDto>(Guid id, TDto dto);
         Task<bool> DeleteAsync(Guid id);
+        public Task<bool> DeleteMultipleAsync(List<Guid> ids);
+        public byte[] ExportToExcelDynamic<TData>(IEnumerable<TData> data, List<ExcelColumnDto> columns, string sheetName = "Sheet1");
+
     }
 }

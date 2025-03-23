@@ -23,6 +23,11 @@ namespace Ecom.Context
         public DbSet<san_pham> san_pham { get; set; }
         //public DbSet<san_pham_marketing> san_pham_marketing { get; set; }
         public DbSet<thong_bao> thong_bao { get; set; }
+        public DbSet<ma_giam_gia> ma_gia_gia { get; set; }
+        public DbSet<phieu_nhap_kho> phieu_nhap_kho { get; set; }
+        public DbSet<chi_tiet_phieu_nhap_kho> chi_tiet_phieu_nhap_kho { get; set; }
+
+        public DbSet<chuong_trinh_marketing> chuong_trinh_marketing { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +50,19 @@ namespace Ecom.Context
             modelBuilder.Entity<san_pham>()
                 .Property(e => e.khuyen_mai)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<chi_tiet_phieu_nhap_kho>()
+                .Property(e => e.don_gia)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<ma_giam_gia>()
+                .Property(e => e.giam_gia)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<phieu_nhap_kho>()
+                .Property(e => e.thanh_tien)
+                .HasPrecision(18, 2);
+
         }
     }
 }
