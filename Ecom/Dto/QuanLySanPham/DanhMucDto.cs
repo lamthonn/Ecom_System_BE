@@ -9,11 +9,7 @@ namespace Ecom.Dto.QuanLySanPham
         public string? ma_danh_muc { get; set; }
         public string? ten_danh_muc { get; set; }
         public string? mo_ta { get; set; }
-        public DateTime? Created { get; set; }
         public DateTime? fromDate { get; set; }
         public DateTime? toDate { get; set; }
-        public string? CreatedBy { get; set; }
-        public DateTime? LastModified { get; set; }
-        public string? LastModifiedBy { get; set; }
     }
 }
