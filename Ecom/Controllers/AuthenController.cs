@@ -140,6 +140,18 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [HttpPut]
+        public async Task<bool> BlockUser([FromQuery] Guid id)
+        {
+            try
+            {
+                return await _authService.blockUser(id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
         //[HttpGet("check-auth")]
         //public IActionResult CheckAuth()
