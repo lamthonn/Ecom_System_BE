@@ -226,8 +226,11 @@ namespace Ecom.Services
 
                 if (user == null)
                     throw new Exception("Không tìm thấy tài khoản");
-
-                return _mapper.Map<accountDetailDto>(user);
+                var listNganHang = _context.ngan_hang.Where(x => x.account_id == userId);
+                
+                var result = _mapper.Map<accountDetailDto>(user);
+                result.listNganHangs = _mapper.Map<List<NganHangDto>>(listNganHang);
+                return result;
             }
             catch (Exception e)
             {

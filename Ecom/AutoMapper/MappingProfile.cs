@@ -40,6 +40,9 @@ namespace Ecom.AutoMapper
             // chương trình mar
             CreateMap<ChuongTrinhMarDto, chuong_trinh_marketing>().ReverseMap();
 
+            // ngân hàng
+            CreateMap<NganHangDto, ngan_hang>().ReverseMap();
+
             // Định nghĩa ánh xạ chung cho PaginatedList<T>
             CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>))
                 .ConvertUsing(typeof(PaginatedListConverter<,>));

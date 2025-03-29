@@ -44,6 +44,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IDanhMucSanPhamService, DanhMucSanPham>();
 builder.Services.AddTransient<ISanPhamService, SanPhamService>();
+builder.Services.AddTransient<INganHangService, NganHangService>();
 builder.Services.AddTransient<SaveFileCommon>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

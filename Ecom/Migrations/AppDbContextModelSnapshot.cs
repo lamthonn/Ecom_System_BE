@@ -537,6 +537,56 @@ namespace Ecom.Migrations
                     b.ToTable("ma_gia_gia");
                 });
 
+            modelBuilder.Entity("Ecom.Entity.ngan_hang", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("account_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("accountid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("is_default")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("so_tai_khoan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("so_the")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ten_ngan_hang")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ten_tai_khoan")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("accountid");
+
+                    b.ToTable("ngan_hang");
+                });
+
             modelBuilder.Entity("Ecom.Entity.phieu_nhap_kho", b =>
                 {
                     b.Property<Guid>("id")
@@ -792,6 +842,15 @@ namespace Ecom.Migrations
                         .HasForeignKey("Accountid");
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("Ecom.Entity.ngan_hang", b =>
+                {
+                    b.HasOne("Ecom.Entity.account", "account")
+                        .WithMany()
+                        .HasForeignKey("accountid");
+
+                    b.Navigation("account");
                 });
 
             modelBuilder.Entity("Ecom.Entity.san_pham", b =>
