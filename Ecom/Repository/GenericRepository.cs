@@ -10,6 +10,7 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using System.Linq.Expressions;
 using Ecom.Dto.Common;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Ecom.Repository
 {
@@ -30,17 +31,40 @@ namespace Ecom.Repository
         // Phương thức hỗ trợ lọc dữ liệu bằng Expression
         // GET /api/items?pageNumber=1&pageSize=10&keySearch={"name":"Nam hip","email":"abc@gmail.com"}
 
-        private IQueryable<T> ApplySearchFilter(IQueryable<T> query, string propertyName, string value)
+        private IQueryable<T> ApplySearchFilter(IQueryable<T> query, string propertyName, object value)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
             var property = Expression.PropertyOrField(parameter, propertyName);
             Expression condition;
 
-            if (property.Type == typeof(string))
+            if (property.Type == typeof(string) && value is string stringValue)
             {
                 var method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                var valueExpression = Expression.Constant(value, typeof(string));
+                var valueExpression = Expression.Constant(stringValue, typeof(string));
                 condition = Expression.Call(property, method, valueExpression);
+            }
+            else if (property.Type == typeof(bool) && value is bool boolValue) // Xử lý bool
+            {
+                var valueExpression = Expression.Constant(boolValue, typeof(bool));
+                condition = Expression.Equal(property, valueExpression);
+            }
+            else if (property.Type == typeof(bool?)) // Xử lý bool?
+            {
+                if (value is bool nullableBoolValue)
+                {
+                    var hasValueProperty = Expression.Property(property, "HasValue");
+                    var valueProperty = Expression.Property(property, "Value");
+                    var valueExpression = Expression.Constant(nullableBoolValue, typeof(bool));
+
+                    // Điều kiện: x.trang_thai.HasValue && x.trang_thai.Value == boolValue
+                    var notNullCheck = Expression.Equal(hasValueProperty, Expression.Constant(true));
+                    var valueCheck = Expression.Equal(valueProperty, valueExpression);
+                    condition = Expression.AndAlso(notNullCheck, valueCheck);
+                }
+                else
+                {
+                    throw new ArgumentException($"Cannot convert {value} to boolean.");
+                }
             }
             else
             {
@@ -53,13 +77,15 @@ namespace Ecom.Repository
             return query.Where(lambda);
         }
 
+
+
         public async Task<PaginatedList<TDto>> GetAllAsync<TDto>(PaginParams paginParams)
         {
             var query = _dbSet.AsQueryable();
 
             if (!string.IsNullOrEmpty(paginParams.keySearch))
             {
-                var searchDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(paginParams.keySearch);
+                var searchDict = JsonConvert.DeserializeObject<Dictionary<string, object>>(paginParams.keySearch);
                 if (searchDict != null)
                 {
                     foreach (var filter in searchDict)
@@ -72,6 +98,7 @@ namespace Ecom.Repository
             var paginatedResult = await PaginatedList<T>.Create(query, paginParams.pageNumber, paginParams.pageSize);
             return _mapper.Map<PaginatedList<TDto>>(paginatedResult);
         }
+
 
         public async Task<TDto> GetByIdAsync<TDto>(Guid id)
         {
@@ -152,6 +179,7 @@ namespace Ecom.Repository
                 throw new ArgumentException("Danh sách cột không được rỗng.");
             }
 
+
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var package = new ExcelPackage())
             {
@@ -190,8 +218,15 @@ namespace Ecom.Repository
                             var value = propertyInfo.GetValue(item);
                             if (value != null)
                             {
-                                // Nếu có định dạng (ví dụ: cho ngày tháng), áp dụng định dạng
-                                if (!string.IsNullOrEmpty(column.Format) && value is DateTime dateValue)
+                                // 📌 Nếu giá trị là kiểu bool, áp dụng BoolTrueValue / BoolFalseValue
+                                if (value is bool boolValue)
+                                {
+                                    worksheet.Cells[row, i + 2].Value = boolValue
+                                        ? column.BoolTrueValue ?? "True"
+                                        : column.BoolFalseValue ?? "False";
+                                }
+                                // 📌 Nếu có định dạng ngày tháng
+                                else if (!string.IsNullOrEmpty(column.Format) && value is DateTime dateValue)
                                 {
                                     worksheet.Cells[row, i + 2].Value = dateValue.ToString(column.Format);
                                 }

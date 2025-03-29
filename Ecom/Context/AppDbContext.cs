@@ -28,6 +28,7 @@ namespace Ecom.Context
         public DbSet<chi_tiet_phieu_nhap_kho> chi_tiet_phieu_nhap_kho { get; set; }
 
         public DbSet<chuong_trinh_marketing> chuong_trinh_marketing { get; set; }
+        public DbSet<ngan_hang> ngan_hang { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

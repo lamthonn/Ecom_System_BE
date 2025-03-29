@@ -48,6 +48,8 @@ namespace Ecom.AutoMapper
             // chương trình mar
             CreateMap<ChuongTrinhMarDto, chuong_trinh_marketing>().ReverseMap();
 
+            // ngân hàng
+            CreateMap<NganHangDto, ngan_hang>().ReverseMap();
             //Phiếu nhập kho
             CreateMap<phieu_nhap_kho, PhieuNhapKhoDto>();
             CreateMap<PhieuNhapKhoDto, phieu_nhap_kho>();
