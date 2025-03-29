@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Services
 {
-    public class DonHangService : IDonHangService
+    public class DonHangService : IDonHangService 
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
@@ -63,6 +63,24 @@ namespace Ecom.Services
             {
                 throw new Exception(ex.Message);
             }
+        }
+
+        public Task XuLyDonHang(string id, DonHangDto request)
+        {
+            var donHang = _context.don_hang.FirstOrDefault(x => x.id.ToString() == id);
+            if(request.trang_thai == null)
+            {
+                throw new Exception("Không có trạng thái thay đổi");
+            }
+
+            if(donHang != null && request.trang_thai != null)
+            {
+                donHang.trang_thai = request.trang_thai ?? donHang.trang_thai;
+                _context.don_hang.Update(donHang);
+                _context.SaveChanges();
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

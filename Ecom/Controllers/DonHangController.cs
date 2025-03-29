@@ -28,5 +28,17 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
+        
+        [HttpPut]
+        [Route("xu-ly/{id}")]
+        public IActionResult XuLyDonHang(string id, DonHangDto request)
+        {
+            try
+            {
+                _service.XuLyDonHang(id,request);
+                return Ok();
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
     }
 }
