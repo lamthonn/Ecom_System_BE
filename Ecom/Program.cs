@@ -45,6 +45,8 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IDanhMucSanPhamService, DanhMucSanPham>();
 builder.Services.AddTransient<ISanPhamService, SanPhamService>();
 builder.Services.AddTransient<INganHangService, NganHangService>();
+builder.Services.AddTransient<IPhieuNhapKhoService, PhieuNhapKhoService>();
+builder.Services.AddTransient<IDonHangService, DonHangService>();
 builder.Services.AddTransient<SaveFileCommon>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -91,9 +93,21 @@ app.UseHttpsRedirection();
 
 //app.UseCors(MyAllowSpecificOrigins);
 app.UseCors("AllowFrontend");
-
+if (!app.Environment.IsDevelopment())
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+}
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapFallbackToFile("index.html"); // Định tuyến SPA về index.html
+});
+
+
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(

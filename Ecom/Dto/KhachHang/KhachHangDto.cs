@@ -13,5 +13,6 @@ namespace Ecom.Dto.KhachHang
         [DefaultValue(true)]
         public bool? trang_thai { get; set; }
         public string? so_dien_thoai { get; set; }    
+        public bool? is_super_admin { get; set; }
     }
 }

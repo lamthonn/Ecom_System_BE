@@ -234,6 +234,43 @@ namespace Ecom.Services
             }
         }
 
+        public async Task<PaginatedList<SanPhamDto>> GetAllSKU(SanPhamDto request)
+        {
+            try
+            {
+                IQueryable<san_pham> dataQuery = _context.san_pham.Where(x=> x.is_active == true).AsNoTracking();
+
+                if (!string.IsNullOrEmpty(request.danh_muc_id.ToString()))
+                {
+                    dataQuery = dataQuery.Where(x => x.danh_muc_id.Equals(request.danh_muc_id));
+                }
+
+                var result = await PaginatedList<SanPhamDto>.Create(dataQuery.Select(x => new SanPhamDto
+                {
+                    id = x.id,
+                    ten_danh_muc = _context.danh_muc.FirstOrDefault(y=> y.id == x.danh_muc_id)!.ten_danh_muc,
+                    ma_san_pham = x.ma_san_pham,
+                    ten_san_pham = x.ten_san_pham,
+                    mo_ta = x.mo_ta,
+                    danh_muc_id = x.danh_muc_id,
+                    is_active = x.is_active,
+                    xuat_xu = x.xuat_xu,
+                    gia = x.gia,
+                    sku = x.sku,
+                    khuyen_mai = x.khuyen_mai,
+                    so_luong = x.so_luong,
+                    duong_dan_anh_bia = x.duong_dan_anh_bia,
+                    Created = x.Created
+                }), request.pageNumber, request.pageSize);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
         public Task<List<SanPhamDto>> GetByMa([FromRoute]string ma)
         {
             var dataQuery = _context.san_pham.Where(x => x.ma_san_pham == ma);

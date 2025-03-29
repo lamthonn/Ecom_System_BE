@@ -4,6 +4,7 @@ using Ecom.Dto;
 using Ecom.Dto.KhachHang;
 using Ecom.Dto.ProductTest;
 using Ecom.Dto.QuanLySanPham;
+using Ecom.Dto.VanHanh;
 using Ecom.Entity;
 using global::AutoMapper;
 using System.Collections.Generic;
@@ -22,9 +23,16 @@ namespace Ecom.AutoMapper
             // khách hàng
             CreateMap<account, KhachHangDto>()
                 .ReverseMap();
+
+            //sản phẩm
             CreateMap<san_pham, SanPhamDto>()
-                .ForMember(dest => dest.ds_anh_san_pham, opt => opt.MapFrom(src => src.ds_anh_san_pham!.Where(x=> x.ma_san_pham == src.ma_san_pham))); 
+                .ForMember(dest => dest.ds_anh_san_pham, opt => opt.MapFrom(src => src.ds_anh_san_pham!.Where(x=> x.ma_san_pham == src.ma_san_pham))) 
+                .ForMember(dest => dest.ten_danh_muc, opt => opt.MapFrom(src => src.danh_Muc!.ten_danh_muc)); 
             CreateMap<SanPhamDto, san_pham>();
+
+            //đơn hàng
+            CreateMap<don_hang, DonHangDto>();
+            CreateMap<DonHangDto, don_hang>();
 
             // account detail
             CreateMap<accountDetailDto, account>().ReverseMap();
@@ -42,6 +50,12 @@ namespace Ecom.AutoMapper
 
             // ngân hàng
             CreateMap<NganHangDto, ngan_hang>().ReverseMap();
+            //Phiếu nhập kho
+            CreateMap<phieu_nhap_kho, PhieuNhapKhoDto>();
+            CreateMap<PhieuNhapKhoDto, phieu_nhap_kho>();
+            //chi tiết phiếu nhập
+            CreateMap<chi_tiet_phieu_nhap_kho, ChiTietPhieuNhapDto>();
+            CreateMap<ChiTietPhieuNhapDto, chi_tiet_phieu_nhap_kho>();
 
             // Định nghĩa ánh xạ chung cho PaginatedList<T>
             CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>))

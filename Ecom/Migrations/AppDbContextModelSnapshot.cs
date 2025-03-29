@@ -148,6 +148,9 @@ namespace Ecom.Migrations
                     b.Property<Guid?>("San_phamid")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal?>("don_gia")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<Guid>("don_hang_id")
                         .HasColumnType("uniqueidentifier");
 
