@@ -33,5 +33,21 @@ namespace Ecom.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
+        [HttpGet("dashboard")]
+        public async Task<DashboardStatsDto> GetDashboardStats(
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endDate)
+        {
+            try
+            {
+                var result = await _service.GetDashboardStats(startDate, endDate);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

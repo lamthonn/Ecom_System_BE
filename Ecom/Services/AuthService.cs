@@ -430,5 +430,15 @@ namespace Ecom.Services
                 throw new Exception(e.Message);
             }
         }
+
+        public async Task<bool> blockUser(Guid id)
+        {
+            var user = await _context.account.FirstOrDefaultAsync(_ => _.id == id);
+            if (user == null) throw new Exception("not found user");
+            user.trang_thai = !user.trang_thai;
+            _context.Update(user);
+            await _context.SaveChangesAsync(new CancellationToken());
+            return true;
+        }
     }
 }

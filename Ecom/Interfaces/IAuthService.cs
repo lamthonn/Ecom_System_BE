@@ -12,5 +12,6 @@ namespace Ecom.Interfaces
         public Task<string> UpdatePhone(UpdatePhoneDto request);
         public Task<string> UpdateEmail(UpdateEmailDto request);
         public Task<string> UpdatePassword(UpdatePasswordDto request);
+        public Task<bool> blockUser(Guid id);
     }
 }
