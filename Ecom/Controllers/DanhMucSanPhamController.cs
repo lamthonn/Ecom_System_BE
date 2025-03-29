@@ -1,6 +1,7 @@
 ﻿using backend_v3.Models;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace Ecom.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class DanhMucSanPhamController : ControllerBase
     {
         private readonly IDanhMucSanPhamService _service;

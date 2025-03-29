@@ -4,6 +4,7 @@ using Ecom.Context;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
 using Ecom.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Services
 {
@@ -17,24 +18,47 @@ namespace Ecom.Services
             _mapper = mapper;
         }
 
-       public async Task<PaginatedList<DonHangDto>> GetAll(DonHangDto request)
-{
-    try
-    {
-        // Thay vì ToList(), hãy để IQueryable
-        var query = _context.don_hang.Where(x => x.trang_thai == request.trang_thai);
+        public async Task<PaginatedList<DonHangDto>> GetAll(DonHangDto request)
+        {
+            try
+            {
+                // Thay vì ToList(), hãy để IQueryable
+                var query = _context.don_hang.AsNoTracking();
+                if(request.trang_thai != null)
+                {
+                    query = query.Where(x => x.trang_thai == request.trang_thai);
+                }
 
-        // Ánh xạ dữ liệu trước khi đưa vào phân trang
-        var dataDto = _mapper.ProjectTo<DonHangDto>(query);
+                var dataDto = from x in query
+                              let ChiTiet = _context.chi_tiet_don_hang.FirstOrDefault(y => y.don_hang_id == x.id)
+                              let AnhDaiDien = _context.san_pham.FirstOrDefault(z => z.id == ChiTiet.san_pham_id)!.duong_dan_anh_bia
+                              select new DonHangDto
+                              {
+                                  id = x.id,
+                                  account_id = x.account_id,
+                                  tong_tien = x.tong_tien,
+                                  ma_don_hang = x.ma_don_hang,
+                                  trang_thai = x.trang_thai,
+                                  dvvc_id = x.dvvc_id,
+                                  ngay_mua = x.ngay_mua,
+                                  thanh_tien = x.thanh_tien,
+                                  Created = x.Created,
+                                  LastModified = x.LastModified,
+                                  CreatedBy = x.CreatedBy,
+                                  LastModifiedBy = x.LastModifiedBy,
+                                  anh_dai_dien = AnhDaiDien
+                              };
+                // Sắp xếp theo trạng thái tăng dần, sau đó ngày mua giảm dần
+                dataDto = dataDto.OrderBy(x => x.trang_thai).ThenByDescending(x => x.ngay_mua);
 
-        // Truyền IQueryable vào PaginatedList
-        var result = await PaginatedList<DonHangDto>.Create(dataDto, request.pageNumber, request.pageSize);
-        return result;
-    }
-    catch (Exception ex)
-    {
-        throw new Exception(ex.Message);
-    }
-}
+                // Truyền IQueryable vào PaginatedList
+                var result = await PaginatedList<DonHangDto>.Create(dataDto, request.pageNumber, request.pageSize);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
