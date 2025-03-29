@@ -100,13 +100,15 @@ if (!app.Environment.IsDevelopment())
     app.UseStaticFiles();
 }
 app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapFallbackToFile("index.html"); // Định tuyến SPA về index.html
-});
+
+app.UseAuthentication(); // Đảm bảo đã thêm dòng này
+app.UseAuthorization(); // Bắt buộc có
+
+//app.UseEndpoints(endpoints =>
+//{
+app.MapControllers();
+app.MapFallbackToFile("index.html"); // Định tuyến SPA về index.html
+//});
 
 
 app.UseStaticFiles(new StaticFileOptions
