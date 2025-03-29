@@ -64,6 +64,10 @@ namespace Ecom.Context
                 .Property(e => e.thanh_tien)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<chi_tiet_don_hang>()
+                .Property(e => e.don_gia)
+                .HasPrecision(18, 2);
+
         }
     }
 }

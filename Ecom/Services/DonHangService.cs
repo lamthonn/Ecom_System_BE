@@ -28,6 +28,9 @@ namespace Ecom.Services
                 {
                     query = query.Where(x => x.trang_thai == request.trang_thai);
                 }
+                else {
+                    query = query.Where(x => x.trang_thai != 3 && x.trang_thai != 2);
+                }
 
                 var dataDto = from x in query
                               let ChiTiet = _context.chi_tiet_don_hang.FirstOrDefault(y => y.don_hang_id == x.id)
@@ -46,7 +49,8 @@ namespace Ecom.Services
                                   LastModified = x.LastModified,
                                   CreatedBy = x.CreatedBy,
                                   LastModifiedBy = x.LastModifiedBy,
-                                  anh_dai_dien = AnhDaiDien
+                                  anh_dai_dien = AnhDaiDien,
+                                  tai_khoan = _context.account.FirstOrDefault(y => y.id == x.account_id)
                               };
                 // Sắp xếp theo trạng thái tăng dần, sau đó ngày mua giảm dần
                 dataDto = dataDto.OrderBy(x => x.trang_thai).ThenByDescending(x => x.ngay_mua);
