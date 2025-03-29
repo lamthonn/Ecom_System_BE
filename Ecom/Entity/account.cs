@@ -16,6 +16,10 @@ namespace Ecom.Entity
         public bool? gioi_tinh { get; set; }
         public string? email { get; set; }
         [DefaultValue(true)]
+        /// <summary>
+        /// 0: Đang khóa
+        /// 1: Đang hoạt động
+        /// </summary>
         public bool? trang_thai { get; set; }
         public string? so_dien_thoai { get; set; }
         public string? RefreshToken { get; set; } // Lưu Refresh Token

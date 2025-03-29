@@ -28,6 +28,17 @@ namespace Ecom.Controllers
         }
         
         [HttpGet]
+        [Route("get-all-sku")]
+        public Task<PaginatedList<SanPhamDto>> GetAllSKU([FromQuery] SanPhamDto request)
+        {
+            try
+            {
+                return _service.GetAllSKU(request);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+        
+        [HttpGet]
         [Route("get-by-ma/{ma}")]
         public Task<List<SanPhamDto>> GetByMa([FromRoute] string ma)
         {

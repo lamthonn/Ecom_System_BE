@@ -8,6 +8,9 @@ namespace Ecom.Interfaces
         public Task<string> Login(accountDto request);
         public Task<loginDto> LoginAdmin(accountDto request);
         public Task<loginDto> RefreshToken(RefreshTokenRequest request);
-
+        public Task<accountDetailDto> getDetailAcc();
+        public Task<string> UpdatePhone(UpdatePhoneDto request);
+        public Task<string> UpdateEmail(UpdateEmailDto request);
+        public Task<string> UpdatePassword(UpdatePasswordDto request);
     }
 }

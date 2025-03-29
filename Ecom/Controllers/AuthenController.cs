@@ -91,6 +91,55 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [HttpGet()]
+        public Task<accountDetailDto> getDetailAcc()
+        {
+            try
+            {
+                return _authService.getDetailAcc();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        [HttpPut()]
+        public Task<string> UpdatePassword(UpdatePasswordDto request)
+        {
+            try
+            {
+                return _authService.UpdatePassword(request);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        [HttpPut()]
+        public Task<string> UpdateEmail(UpdateEmailDto request)
+        {
+            try
+            {
+                return _authService.UpdateEmail(request);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        [HttpPut()]
+        public Task<string> UpdatePhone(UpdatePhoneDto request)
+        {
+            try
+            {
+                return _authService.UpdatePhone(request);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
         //[HttpGet("check-auth")]
         //public IActionResult CheckAuth()

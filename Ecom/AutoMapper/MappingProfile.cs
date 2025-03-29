@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using backend_v3.Models;
+using Ecom.Dto;
+using Ecom.Dto.KhachHang;
 using Ecom.Dto.ProductTest;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
@@ -18,9 +20,33 @@ namespace Ecom.AutoMapper
                 .ForMember(dest => dest.ma_san_pham_dto, opt => opt.MapFrom(src => src.ma_san_pham))
                 .ReverseMap();
 
+            // khách hàng
+            CreateMap<account, KhachHangDto>()
+                .ReverseMap();
+
+            //sản phẩm
             CreateMap<san_pham, SanPhamDto>()
-                .ForMember(dest => dest.ds_anh_san_pham, opt => opt.MapFrom(src => src.ds_anh_san_pham!.Where(x=> x.ma_san_pham == src.ma_san_pham))); 
+                .ForMember(dest => dest.ds_anh_san_pham, opt => opt.MapFrom(src => src.ds_anh_san_pham!.Where(x=> x.ma_san_pham == src.ma_san_pham))) 
+                .ForMember(dest => dest.ten_danh_muc, opt => opt.MapFrom(src => src.danh_Muc!.ten_danh_muc)); 
             CreateMap<SanPhamDto, san_pham>();
+
+            //đơn hàng
+            CreateMap<don_hang, DonHangDto>();
+            CreateMap<DonHangDto, don_hang>();
+
+            // account detail
+            CreateMap<accountDetailDto, account>().ReverseMap();
+
+            // mã giảm giá
+            CreateMap<MaGiamGiaDto, ma_giam_gia>()
+                .ForMember(dest => dest.id, opt => opt.Ignore())
+                .ForMember(dest => dest.bat_dau, opt => opt.MapFrom(src => src.thoi_gian[0]))
+                .ForMember(dest => dest.ket_thuc, opt => opt.MapFrom(src => src.thoi_gian[1]));
+            CreateMap<ma_giam_gia, MaGiamGiaDto>()
+                .ForMember(dest => dest.thoi_gian, opt => opt.MapFrom(src => new List<DateTime?> { src.bat_dau, src.ket_thuc }));
+
+            // chương trình mar
+            CreateMap<ChuongTrinhMarDto, chuong_trinh_marketing>().ReverseMap();
 
             //Phiếu nhập kho
             CreateMap<phieu_nhap_kho, PhieuNhapKhoDto>();

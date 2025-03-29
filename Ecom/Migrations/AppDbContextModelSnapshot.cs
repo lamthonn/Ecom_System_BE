@@ -266,6 +266,36 @@ namespace Ecom.Migrations
                     b.ToTable("chi_tiet_phieu_nhap_kho");
                 });
 
+            modelBuilder.Entity("Ecom.Entity.chuong_trinh_marketing", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("cong_cu")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ten")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("chuong_trinh_marketing");
+                });
+
             modelBuilder.Entity("Ecom.Entity.danh_gia", b =>
                 {
                     b.Property<Guid>("id")

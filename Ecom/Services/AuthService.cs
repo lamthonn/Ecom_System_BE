@@ -1,9 +1,11 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Ecom.Context;
 using Ecom.Dto;
 using Ecom.Entity;
 using Ecom.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,12 +19,14 @@ namespace Ecom.Services
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
 
-        public AuthService(AppDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public AuthService(AppDbContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         public Task<string> Register(accountDto request)
@@ -205,14 +209,41 @@ namespace Ecom.Services
             }
         }
 
+        async public Task<accountDetailDto> getDetailAcc()
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                return _mapper.Map<accountDetailDto>(user);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+
         private string GenerateJwtToken(account user)
         {
             var claims = new List<Claim> {
-        new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
-        new Claim("id", user.id.ToString()),
-        new Claim("tai_khoan", user.tai_khoan),
-        new Claim("role", user.is_super_admin.ToString())
-    };
+                new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
+                new Claim("id", user.id.ToString()),
+                new Claim("tai_khoan", user.tai_khoan),
+                new Claim("role", user.is_super_admin.ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -226,6 +257,18 @@ namespace Ecom.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+        public Dictionary<string, string> DecodeJwtToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (jwtToken == null)
+                throw new ArgumentException("Invalid token");
+
+            var claims = jwtToken.Claims.ToDictionary(c => c.Type, c => c.Value);
+            return claims;
+        }
+
 
         private string GenerateRefreshToken()
         {
@@ -260,6 +303,126 @@ namespace Ecom.Services
             //_context.Update(user);
             //await _context.SaveChangesAsync();
             return new loginDto { token = newAccessToken, refreshToken = user.RefreshToken };
+        }
+
+        async public Task<string> UpdatePhone(UpdatePhoneDto request)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                // Cập nhật số điện thoại
+                user.so_dien_thoai = request.so_dien_thoai;
+                user.LastModified = DateTime.Now;
+                user.LastModifiedBy = user.tai_khoan;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                return "Cập nhật số điện thoại thành công!";
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        // Cập nhật email
+        async public Task<string> UpdateEmail(UpdateEmailDto request)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                // Kiểm tra email có bị trùng không
+                var emailDuplicate = await _context.account.FirstOrDefaultAsync(x => x.email == request.email && x.id != userId);
+                if (emailDuplicate != null)
+                    throw new Exception("Email đã được sử dụng bởi tài khoản khác");
+
+                // Cập nhật email
+                user.email = request.email;
+                user.LastModified = DateTime.Now;
+                user.LastModifiedBy = user.tai_khoan;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                return "Cập nhật email thành công!";
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        // Cập nhật mật khẩu
+        async public Task<string> UpdatePassword(UpdatePasswordDto request)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                // Kiểm tra mật khẩu cũ
+                var salt = Convert.FromBase64String(user.salt!);
+                var hashedOldPassword = GetPBKDF2(request.oldPassword, salt);
+                if (hashedOldPassword != user.mat_khau)
+                    throw new Exception("Mật khẩu cũ không đúng");
+
+                // Tạo salt mới cho mật khẩu mới
+                byte[] newSalt = GenerateSalt();
+                string newHashedPassword = GetPBKDF2(request.newPassword, newSalt);
+
+                // Cập nhật mật khẩu và salt mới
+                user.mat_khau = newHashedPassword;
+                user.salt = Convert.ToBase64String(newSalt);
+                user.LastModified = DateTime.Now;
+                user.LastModifiedBy = user.tai_khoan;
+
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+
+                return "Cập nhật mật khẩu thành công!";
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }

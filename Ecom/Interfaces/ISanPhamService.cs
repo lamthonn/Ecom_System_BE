@@ -7,6 +7,7 @@ namespace Ecom.Interfaces
     public interface ISanPhamService
     {
         public Task<PaginatedList<SanPhamDto>> GetAll(SanPhamDto request);
+        public Task<PaginatedList<SanPhamDto>> GetAllSKU(SanPhamDto request);
         public Task<List<SanPhamDto>> GetByMa([FromRoute]string ma);
         public Task<List<SanPhamDto>> create(List<SanPhamDto> request);
         public Task Edit(EditSanPhamRequest request);

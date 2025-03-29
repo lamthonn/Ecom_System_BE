@@ -30,5 +30,55 @@ namespace Ecom.Controllers
             catch (Exception ex) { throw new Exception(ex.Message); }
 
         }
+        
+        //tạo phiếu nhập kho
+        [HttpPost]
+        [Route("create")]
+        public Task<PhieuNhapKhoDto> Created(PhieuNhapKhoDto request)
+        {
+            try
+            {
+                return _service.Create(request);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+
+        }
+        
+        [HttpGet]
+        [Route("get-by-id/{id}")]
+        public Task<PhieuNhapKhoDto> GetById(string id)
+        {
+            try
+            {
+                return _service.GetById(id);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+
+        }
+        
+        [HttpPost]
+        [Route("edit/{id}")]
+        public Task<PhieuNhapKhoDto> Edit(string id, PhieuNhapKhoDto request)
+        {
+            try
+            {
+                return _service.Edit(id, request);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+
+        }
+
+        [HttpPut]
+        [Route("xu-ly/{id}")]
+        public IActionResult XuLy(string id)
+        {
+            try
+            {
+                _service.XuLyPhieuNhap(id);
+                return Ok();
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+
+        }
     }
 }

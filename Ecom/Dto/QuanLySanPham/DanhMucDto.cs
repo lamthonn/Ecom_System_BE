@@ -1,5 +1,4 @@
 ﻿using backend_v3.Dto.Common;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Ecom.Dto.QuanLySanPham
 {
