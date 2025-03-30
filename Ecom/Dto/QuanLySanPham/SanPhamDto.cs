@@ -26,6 +26,7 @@ namespace Ecom.Dto.QuanLySanPham
         public DateTime? fromDate { get; set; }
         public DateTime? toDate { get; set; }
         public bool? is_active { get; set; } = true;
+        public string? duongDanAnh { get; set; }
     }
 
     public class AddListImageProps

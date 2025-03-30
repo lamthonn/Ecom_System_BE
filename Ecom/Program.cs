@@ -29,15 +29,12 @@ builder.Services.AddSwaggerGen();
 //CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-    policy =>
-    {
-        policy.WithOrigins("http://localhost:3000") // Đổi localhost:3000 thành domain FE của bạn
-              .AllowCredentials()// Cho phép gửi credentials như cookies hoặc tokens
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    options.AddPolicy("AllowAll",
+        builder => builder.AllowAnyOrigin()
+                          .AllowAnyMethod()
+                          .AllowAnyHeader());
 });
+
 
 
 //service
@@ -93,7 +90,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //app.UseCors(MyAllowSpecificOrigins);
-app.UseCors("AllowFrontend");
+app.UseCors("AllowAll");
 if (!app.Environment.IsDevelopment())
 {
     app.UseDefaultFiles();
