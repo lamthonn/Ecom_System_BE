@@ -8,8 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ecom.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
+    [ApiController]    
     public class DanhMucSanPhamController : ControllerBase
     {
         private readonly IDanhMucSanPhamService _service;
@@ -39,7 +38,7 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
-
+        [Authorize]
         [HttpPost]
         [Route("create")]
         public Task<DanhMucDto> Create(DanhMucDto request)
@@ -50,7 +49,7 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
-
+        [Authorize]
         [HttpPut]
         [Route("edit/{id}")]
         public void Edit(string id, DanhMucDto request)
@@ -61,7 +60,7 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
-
+        [Authorize]
         [HttpDelete]
         [Route("delete/{id}")]
         public void Delete(string id)
@@ -72,7 +71,7 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
-        
+        [Authorize]
         [HttpDelete]
         [Route("delete-any")]
         public void DeleteAny([FromBody]List<string> ids)
@@ -83,7 +82,7 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
-
+        [Authorize]
         [HttpPost]
         [Route("export")]
 

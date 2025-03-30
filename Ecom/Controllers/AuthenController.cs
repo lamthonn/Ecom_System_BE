@@ -91,6 +91,7 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [Authorize]
         [HttpGet()]
         public Task<accountDetailDto> getDetailAcc()
         {
@@ -103,7 +104,7 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
-
+        [Authorize]
         [HttpPut()]
         public Task<string> UpdatePassword(UpdatePasswordDto request)
         {
@@ -116,6 +117,7 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [Authorize]
         [HttpPut()]
         public Task<string> UpdateEmail(UpdateEmailDto request)
         {
@@ -128,6 +130,7 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [Authorize]
         [HttpPut()]
         public Task<string> UpdatePhone(UpdatePhoneDto request)
         {
@@ -140,6 +143,7 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [Authorize]
         [HttpPut]
         public async Task<bool> BlockUser([FromQuery] Guid id)
         {

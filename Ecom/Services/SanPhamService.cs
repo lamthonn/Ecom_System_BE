@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using OfficeOpenXml.Style;
 using OfficeOpenXml;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Ecom.Services
 {
@@ -197,6 +198,10 @@ namespace Ecom.Services
                 {
                     dataQuery = dataQuery.Where(x => x.ma_san_pham.Contains(request.ma_san_pham));
                 }
+                if (!string.IsNullOrEmpty(request.danh_muc_id.ToString()))
+                {
+                    dataQuery = dataQuery.Where(x => x.danh_muc_id == request.danh_muc_id);
+                }
 
                 if (!string.IsNullOrEmpty(request.ten_san_pham))
                 {
@@ -207,6 +212,10 @@ namespace Ecom.Services
                 {
                     dataQuery = dataQuery.Where(x => x.Created > request.fromDate && x.Created < request.toDate);
                 }
+                var duongDanAnhDict = await _context.anh_san_pham
+                    .Where(x => x.ma_san_pham != null)
+                    .GroupBy(x => x.ma_san_pham)
+                    .ToDictionaryAsync(x => x.First().ma_san_pham, x => x.First().duong_dan);
 
                 var dataQueryDto = dataQuery
                 .GroupBy(x => x.ma_san_pham)
@@ -223,6 +232,7 @@ namespace Ecom.Services
                     khuyen_mai = g.First().khuyen_mai,
                     so_luong = g.Sum(y => y.so_luong),
                     Created = g.First().Created,
+                    duongDanAnh = duongDanAnhDict[g.First().ma_san_pham],
                 });
 
                 var result = await PaginatedList<SanPhamDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
