@@ -26,5 +26,8 @@ namespace Ecom.Entity
         public DateTime? RefreshTokenExpiryTime { get; set; } // Hạn sử dụng của Refresh Token
         [DefaultValue(false)]
         public bool? is_super_admin { get; set; }
+        public Guid? dvvc_id { get; set; }
+        public virtual dvvc? dvvc { get; set; }
+
     }
 }

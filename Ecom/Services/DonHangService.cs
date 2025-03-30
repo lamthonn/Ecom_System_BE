@@ -28,9 +28,7 @@ namespace Ecom.Services
                 {
                     query = query.Where(x => x.trang_thai == request.trang_thai);
                 }
-                else {
-                    query = query.Where(x => x.trang_thai != 3 && x.trang_thai != 2);
-                }
+
 
                 var dataDto = from x in query
                               let ChiTiet = _context.chi_tiet_don_hang.FirstOrDefault(y => y.don_hang_id == x.id)
