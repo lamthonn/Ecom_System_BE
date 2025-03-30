@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ecom.Services
 {
-    public class DonHangService : IDonHangService 
+    public class DonHangService : IDonHangService
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
@@ -79,6 +79,27 @@ namespace Ecom.Services
             }
 
             return Task.CompletedTask;
+        }
+
+        public Task XuLyDonHangs(List<DonHangDto> request)
+        {
+            var DonHangIds = request.Select(x => x.id);
+            var dataUpdate = _context.don_hang.Where(x => DonHangIds.Contains(x.id));
+            if(dataUpdate.Count() > 0)
+            {
+                foreach (var item in dataUpdate)
+                {
+                    item.trang_thai = request[0].trang_thai ?? 0;
+                }
+                _context.UpdateRange(dataUpdate);
+                _context.SaveChanges();
+                return Task.CompletedTask;
+            }
+            else
+            {
+                throw new Exception("Không có đơn hàng nào được chọn");
+            }
+
         }
     }
 }

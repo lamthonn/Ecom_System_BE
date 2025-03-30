@@ -16,6 +16,7 @@ namespace Ecom.Dto
         public string? so_dien_thoai { get; set; }
         public string? RefreshToken { get; set; } // Lưu Refresh Token
         public DateTime? RefreshTokenExpiryTime { get; set; } // Hạn sử dụng của Refresh Token
+        public Guid? dvvc_id { get; set; }
         public bool is_super_admin { get; set; }
     }
 

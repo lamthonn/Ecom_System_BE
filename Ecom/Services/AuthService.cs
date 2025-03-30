@@ -117,6 +117,12 @@ namespace Ecom.Services
                         var user = _context.account.FirstOrDefault(x => x.tai_khoan == request.tai_khoan && x.mat_khau == GetMD5(request.mat_khau));
                         if (user != null)
                         {
+                            var userValidate = user.trang_thai == false ? true : false;
+                            if (userValidate == true)
+                            {
+                                throw new Exception("Tài Khoản của bạn đã bị khóa");
+                            }
+
                             var claims = new List<Claim> {
                                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
                                 new Claim("id", user.id.ToString()),
@@ -248,7 +254,8 @@ namespace Ecom.Services
                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
                 new Claim("id", user.id.ToString()),
                 new Claim("tai_khoan", user.tai_khoan),
-                new Claim("role", user.is_super_admin.ToString())
+                new Claim("role", user.is_super_admin.ToString()!),
+                new Claim("dvvc_id", user.dvvc_id.ToString()!)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
