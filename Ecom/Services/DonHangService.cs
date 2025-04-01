@@ -3,6 +3,7 @@ using backend_v3.Models;
 using Ecom.Context;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
+using Ecom.Entity;
 using Ecom.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -48,7 +49,19 @@ namespace Ecom.Services
                                   CreatedBy = x.CreatedBy,
                                   LastModifiedBy = x.LastModifiedBy,
                                   anh_dai_dien = AnhDaiDien,
-                                  tai_khoan = _context.account.FirstOrDefault(y => y.id == x.account_id)
+                                  tai_khoan = _context.account.FirstOrDefault(y => y.id == x.account_id),
+                                  ds_chi_tiet_don_hang = _context.chi_tiet_don_hang.Where(z => z.don_hang_id == x.id).Select(a => new ChiTietDonHangDto
+                                  {
+                                      don_hang_id = a.don_hang_id,
+                                      don_gia = a.don_gia,
+                                      san_pham_id = a.san_pham_id,
+                                      so_luong = a.so_luong,
+                                      id = a.id,
+                                      thanh_tien = a.thanh_tien,
+                                      ten_san_pham = _context.san_pham.FirstOrDefault(b => b.id == a.san_pham_id)!.ten_san_pham,
+                                      mau_sac = _context.san_pham.FirstOrDefault(b => b.id == a.san_pham_id)!.mau_sac,
+                                      kich_thuoc = _context.san_pham.FirstOrDefault(b => b.id == a.san_pham_id)!.size
+                                  }).ToList()
                               };
                 // Sắp xếp theo trạng thái tăng dần, sau đó ngày mua giảm dần
                 dataDto = dataDto.OrderBy(x => x.trang_thai).ThenByDescending(x => x.ngay_mua);
@@ -63,9 +76,9 @@ namespace Ecom.Services
             }
         }
 
-        public Task XuLyDonHang(string id, DonHangDto request)
+        public async Task XuLyDonHang(string id, DonHangDto request)
         {
-            var donHang = _context.don_hang.FirstOrDefault(x => x.id.ToString() == id);
+            var donHang = await _context.don_hang.FirstOrDefaultAsync(x => x.id.ToString() == id);
             if(request.trang_thai == null)
             {
                 throw new Exception("Không có trạng thái thay đổi");
@@ -73,27 +86,58 @@ namespace Ecom.Services
 
             if(donHang != null && request.trang_thai != null)
             {
+                var ChiTiet = await _context.chi_tiet_don_hang.Where(x => x.don_hang_id == donHang.id).ToListAsync();
                 donHang.trang_thai = request.trang_thai ?? donHang.trang_thai;
                 _context.don_hang.Update(donHang);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+                //update lại số lượng sản phẩm còn lại + lượt bán sản phẩm
+                if (request.trang_thai == 4)
+                {
+                    foreach (var chiTiet in ChiTiet)
+                    {
+                        var sanPham = await _context.san_pham.FirstOrDefaultAsync(x=>x.id == chiTiet.san_pham_id);
+                        if (sanPham != null)
+                        {
+                            sanPham.so_luong = sanPham.so_luong - chiTiet.so_luong;
+                            sanPham.luot_ban = sanPham.luot_ban == null ? (0 + chiTiet.so_luong) : (sanPham.luot_ban + chiTiet.so_luong);
+                        }
+                        _context.san_pham.Update(sanPham);
+                    }
+                }
+                await _context.SaveChangesAsync();
             }
 
-            return Task.CompletedTask;
         }
 
-        public Task XuLyDonHangs(List<DonHangDto> request)
+        public async Task XuLyDonHangs(List<DonHangDto> request)
         {
             var DonHangIds = request.Select(x => x.id);
-            var dataUpdate = _context.don_hang.Where(x => DonHangIds.Contains(x.id));
+            var dataUpdate = await _context.don_hang.Where(x => DonHangIds.Contains(x.id)).ToListAsync();
             if(dataUpdate.Count() > 0)
             {
+                //update trạng thái của đơn hàng
                 foreach (var item in dataUpdate)
                 {
+                    var ChiTiet = await _context.chi_tiet_don_hang.Where(x => x.don_hang_id == item.id).ToListAsync();
                     item.trang_thai = request[0].trang_thai ?? 0;
+                    if (request[0].trang_thai == 4)
+                    {
+                        foreach (var chiTiet in ChiTiet)
+                        {
+                            var sanPham = await _context.san_pham.FirstOrDefaultAsync(x=> x.id == chiTiet.san_pham_id);
+                            if (sanPham != null)
+                            {
+                                sanPham.so_luong = sanPham.so_luong - chiTiet.so_luong;
+                                sanPham.luot_ban = sanPham.luot_ban == null ? (0 + chiTiet.so_luong) : (sanPham.luot_ban + chiTiet.so_luong) ;
+                            }
+                            _context.san_pham.Update(sanPham);
+                        }
+                    }
                 }
                 _context.UpdateRange(dataUpdate);
-                _context.SaveChanges();
-                return Task.CompletedTask;
+                //update lại số lượng sản phẩm còn lại + lượt bán sản phẩm
+
+                await _context.SaveChangesAsync();
             }
             else
             {

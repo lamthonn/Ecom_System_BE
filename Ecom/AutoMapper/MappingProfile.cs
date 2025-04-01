@@ -6,8 +6,6 @@ using Ecom.Dto.ProductTest;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
 using Ecom.Entity;
-using global::AutoMapper;
-using System.Collections.Generic;
 
 namespace Ecom.AutoMapper
 {    
@@ -33,6 +31,9 @@ namespace Ecom.AutoMapper
             //đơn hàng
             CreateMap<don_hang, DonHangDto>();
             CreateMap<DonHangDto, don_hang>();
+            CreateMap<chi_tiet_don_hang, ChiTietDonHangDto>()
+                .ForMember(x => x.ten_san_pham, me => me.MapFrom(src => src.San_pham!.ten_san_pham));
+            CreateMap<ChiTietDonHangDto, chi_tiet_don_hang>();
 
             // account detail
             CreateMap<accountDetailDto, account>().ReverseMap();

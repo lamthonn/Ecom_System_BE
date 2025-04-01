@@ -28,27 +28,41 @@ namespace Ecom.Controllers
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
-        
+
         [HttpPut]
         [Route("xu-ly/{id}")]
-        public IActionResult XuLyDonHang(string id, DonHangDto request)
+        public async Task<IActionResult> XuLyDonHang(string id, DonHangDto request)
         {
             try
             {
-                _service.XuLyDonHang(id,request);
-                return Ok();
+                if (string.IsNullOrEmpty(id))
+                {
+                    return BadRequest("ID đơn hàng không hợp lệ.");
+                }
+
+                if (request == null)
+                {
+                    return BadRequest("Dữ liệu yêu cầu không hợp lệ.");
+                }
+
+                await _service.XuLyDonHang(id, request);
+                return NoContent(); // Trả về 204 khi thành công, không có nội dung trả về.
             }
-            catch (Exception ex) { throw new Exception(ex.Message); }
+            catch (Exception ex)
+            {
+                // Trả về BadRequest hoặc NotFound với thông báo lỗi cụ thể
+                return BadRequest(ex.Message); // hoặc NotFound(ex.Message) nếu phù hợp
+            }
         }
-        
+
         [HttpPut]
         [Route("xu-ly-nhieu")]
-        public IActionResult XuLyDonHangs(List<DonHangDto> request)
+        public async Task<IActionResult> XuLyDonHangs(List<DonHangDto> request)
         {
             try
             {
-                _service.XuLyDonHangs(request);
-                return Ok();
+                await _service.XuLyDonHangs(request);
+                return NoContent();
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }

@@ -208,14 +208,24 @@ namespace Ecom.Services
                     dataQuery = dataQuery.Where(x => x.ten_san_pham.Contains(request.ten_san_pham));
                 }
 
+                if (!string.IsNullOrEmpty(request.keySearch))
+                {
+                    dataQuery = dataQuery.Where(x => x.ten_san_pham.Contains(request.keySearch));
+                }
+
+                if(request.khoang_gia_tu != null && request.khoang_gia_den != null)
+                {
+                    dataQuery = dataQuery.Where(x => x.gia > request.khoang_gia_tu && x.gia < request.khoang_gia_den);
+                }
+
                 if (request.fromDate != null && request.toDate != null)
                 {
                     dataQuery = dataQuery.Where(x => x.Created > request.fromDate && x.Created < request.toDate);
                 }
-                var duongDanAnhDict = await _context.anh_san_pham
-                    .Where(x => x.ma_san_pham != null)
-                    .GroupBy(x => x.ma_san_pham)
-                    .ToDictionaryAsync(x => x.First().ma_san_pham, x => x.First().duong_dan);
+                //var duongDanAnhDict = await _context.anh_san_pham
+                //    .Where(x => x.ma_san_pham != null)
+                //    .GroupBy(x => x.ma_san_pham)
+                //    .ToDictionaryAsync(x => x.First().ma_san_pham, x => x.First().duong_dan);
 
                 var dataQueryDto = dataQuery
                 .GroupBy(x => x.ma_san_pham)
@@ -223,6 +233,7 @@ namespace Ecom.Services
                 {
                     id = g.First().id,
                     ma_san_pham = g.Key,
+                    ten_danh_muc = _context.danh_muc.FirstOrDefault(z=> z.id == g.First().danh_muc_id)!.ten_danh_muc,
                     ten_san_pham = g.First().ten_san_pham,
                     mo_ta = g.First().mo_ta,
                     danh_muc_id = g.First().danh_muc_id,
@@ -232,7 +243,7 @@ namespace Ecom.Services
                     khuyen_mai = g.First().khuyen_mai,
                     so_luong = g.Sum(y => y.so_luong),
                     Created = g.First().Created,
-                    duongDanAnh = duongDanAnhDict[g.First().ma_san_pham],
+                    duongDanAnh = g.First().duong_dan_anh_bia,
                 });
 
                 var result = await PaginatedList<SanPhamDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
@@ -314,6 +325,7 @@ namespace Ecom.Services
                     id = x.id,
                     ma_san_pham = x.ma_san_pham,
                     ten_san_pham = x.ten_san_pham,
+                    ten_danh_muc = _context.danh_muc.FirstOrDefault(a=> a.id == x.danh_muc_id)!.ten_danh_muc,
                     danh_muc_id = x.danh_muc_id,
                     duong_dan_anh_bia = x.duong_dan_anh_bia,
                     gia = x.gia,
