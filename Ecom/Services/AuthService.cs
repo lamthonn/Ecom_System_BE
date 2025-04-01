@@ -106,55 +106,47 @@ namespace Ecom.Services
             return salt;
         }
 
-        public Task<string> Login(accountDto request)
+        public async Task<string> Login(accountDto request)
         {
             try
             {
-                if (!string.IsNullOrEmpty(request.tai_khoan) && !string.IsNullOrEmpty(request.mat_khau))
+                if (string.IsNullOrEmpty(request.tai_khoan) || string.IsNullOrEmpty(request.mat_khau))
                 {
-                    if (request.is_super_admin == false)
-                    {
-                        var user = _context.account.FirstOrDefault(x => x.tai_khoan == request.tai_khoan && x.mat_khau == GetMD5(request.mat_khau));
-                        if (user != null)
-                        {
-                            var userValidate = user.trang_thai == false ? true : false;
-                            if (userValidate == true)
-                            {
-                                throw new Exception("Tài Khoản của bạn đã bị khóa");
-                            }
+                    return "Tài khoản và mật khẩu không được để trống!";
+                }
 
-                            var claims = new List<Claim> {
-                                new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
-                                new Claim("id", user.id.ToString()),
-                                new Claim("tai_khoan",user.tai_khoan),
-                                new Claim("role", user.is_super_admin.ToString()! )
-                            };
-                            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-                            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                            var token = new JwtSecurityToken(
-                                _configuration["Jwt:Issuer"],
-                                _configuration["Jwt:Audience"],
-                                claims,
-                                expires: DateTime.UtcNow.AddMinutes(120),
-                                signingCredentials: signIn
-                            );
-                            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-                            return Task.FromResult(jwtToken);
-                        }
-                        else
-                        {
-                            return Task.FromResult("Tài khoản và mật khẩu không đúng!");
-                        }
-                    }
-                    else
-                    {
-                        return Task.FromResult("Tài khoản và mật khẩu không đúng!");
-                    }
-                }
-                else
+                var user = await _context.account.FirstOrDefaultAsync(x => x.tai_khoan == request.tai_khoan);
+                if (user == null)
                 {
-                    return Task.FromResult("Tài khoản và mật khẩu không được để trống!");
+                    return "Tài khoản và mật khẩu không đúng!";
                 }
+
+                var salt = Convert.FromBase64String(user.salt);
+                var hashedPassword = GetPBKDF2(request.mat_khau, salt);
+
+                if (hashedPassword != user.mat_khau)
+                {
+                    return "Tài khoản và mật khẩu không đúng!";
+                }
+
+                var claims = new List<Claim> {
+            new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
+            new Claim("id", user.id.ToString()),
+            new Claim("tai_khoan", user.tai_khoan),
+            new Claim("role", user.is_super_admin.ToString()!)
+        };
+
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+                var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var token = new JwtSecurityToken(
+                    _configuration["Jwt:Issuer"],
+                    _configuration["Jwt:Audience"],
+                    claims,
+                    expires: DateTime.UtcNow.AddMinutes(120),
+                    signingCredentials: signIn
+                );
+
+                return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception e)
             {
