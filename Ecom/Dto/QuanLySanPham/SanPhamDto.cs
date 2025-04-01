@@ -21,6 +21,7 @@ namespace Ecom.Dto.QuanLySanPham
         public string? size { get; set; }
         public decimal? gia { get; set; }
         public decimal? khuyen_mai { get; set; }
+        public decimal? rate { get; set; }
         public List<string>? ds_anh_san_pham { get; set; }
         public List<PhanLoai>? ls_phan_loai { get; set; }
         public DateTime? fromDate { get; set; }

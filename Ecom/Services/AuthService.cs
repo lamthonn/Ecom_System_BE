@@ -106,54 +106,51 @@ namespace Ecom.Services
             return salt;
         }
 
-        public Task<string> Login(accountDto request)
+        public async Task<loginDto> Login(accountDto request)
         {
             try
             {
-                if (!string.IsNullOrEmpty(request.tai_khoan) && !string.IsNullOrEmpty(request.mat_khau))
+                if (!string.IsNullOrEmpty(request.tai_khoan) || !string.IsNullOrEmpty(request.mat_khau))
                 {
                     if (request.is_super_admin == false)
                     {
-                        var user = _context.account.FirstOrDefault(x => x.tai_khoan == request.tai_khoan && x.mat_khau == GetMD5(request.mat_khau));
+                        var user = _context.account.FirstOrDefault(x => x.tai_khoan == request.tai_khoan);
+
                         if (user != null)
                         {
-                            var userValidate = user.trang_thai == false ? true : false;
-                            if (userValidate == true)
+                            // Tạo lại hash mật khẩu từ mật khẩu người dùng nhập vào và salt trong DB
+                            var salt = Convert.FromBase64String(user.salt!); // Salt đã lưu trong DB
+                            var hashedPassword = GetPBKDF2(request.mat_khau, salt);
+                            if (hashedPassword == user.mat_khau)
                             {
-                                throw new Exception("Tài Khoản của bạn đã bị khóa");
-                            }
+                                var jwtToken = GenerateJwtToken(user);
+                                var refreshToken = GenerateRefreshToken();
 
-                            var claims = new List<Claim> {
-                                new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
-                                new Claim("id", user.id.ToString()),
-                                new Claim("tai_khoan",user.tai_khoan),
-                                new Claim("role", user.is_super_admin.ToString()! )
-                            };
-                            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-                            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                            var token = new JwtSecurityToken(
-                                _configuration["Jwt:Issuer"],
-                                _configuration["Jwt:Audience"],
-                                claims,
-                                expires: DateTime.UtcNow.AddMinutes(120),
-                                signingCredentials: signIn
-                            );
-                            var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
-                            return Task.FromResult(jwtToken);
+                                // Lưu Refresh Token vào DB
+                                user.RefreshToken = refreshToken;
+                                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(3);
+                                _context.Update(user);
+                                await _context.SaveChangesAsync();
+                                return new loginDto { token = jwtToken, refreshToken = refreshToken };
+                            }
+                            else
+                            {
+                                throw new Exception("Mật khẩu không đúng");
+                            }
                         }
                         else
                         {
-                            return Task.FromResult("Tài khoản và mật khẩu không đúng!");
+                            throw new Exception("Không tìm thấy tài khoản");
                         }
                     }
                     else
                     {
-                        return Task.FromResult("Tài khoản và mật khẩu không đúng!");
+                        throw new Exception("Tài khoản và mật khẩu không đúng");
                     }
                 }
                 else
                 {
-                    return Task.FromResult("Tài khoản và mật khẩu không được để trống!");
+                    throw new Exception("Tài khoản và mật khẩu không được để trống");
                 }
             }
             catch (Exception e)
@@ -162,7 +159,7 @@ namespace Ecom.Services
             }
         }
 
-        async public Task<loginDto> LoginAdmin(accountDto request)
+        public async Task<loginDto> LoginAdmin(accountDto request)
         {
             try
             {
