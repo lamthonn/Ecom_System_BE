@@ -30,5 +30,49 @@ namespace Ecom.Controllers
             catch (Exception ex) { throw new Exception(ex.Message); }
         }
 
+        [HttpPost]
+        [Authorize]
+        [Route("created")]
+        public Task Created(ChiTietGioHangDto request)
+        {
+            try
+            {
+                return _service.Add(request);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+
+        [HttpPut]
+        [Authorize]
+        [Route("edit")]
+        public Task Edit(ChiTietGioHangDto request)
+        {
+            try
+            {
+                return _service.Edit(request);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+        
+        [HttpDelete]
+        [Authorize]
+        [Route("delete")]
+        public async Task<IActionResult> Delete([FromQuery]string id)
+        {
+            try
+            {
+                await _service.Delete(id);
+                return NoContent(); // 204 No Content for successful deletion
+            }
+            catch (DirectoryNotFoundException) // Custom exception for not found
+            {
+                return NotFound(); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error"); // 500 Internal Server Error
+            }
+        }
+
     }
 }

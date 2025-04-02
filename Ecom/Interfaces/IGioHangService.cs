@@ -8,6 +8,7 @@ namespace Ecom.Interfaces
     {
         public Task<GioHangDto> GetAll(GioHangDto request);
         public Task<ChiTietGioHangDto> Add(ChiTietGioHangDto request);
-        public Task<ChiTietGioHangDto> Edit(ChiTietGioHangDto request);
+        public Task Edit(ChiTietGioHangDto request);
+        public Task Delete(string id);
     }
 }
