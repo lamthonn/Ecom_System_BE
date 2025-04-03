@@ -7,6 +7,7 @@ using Ecom.Dto.ProductTest;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
 using Ecom.Entity;
+using System.Globalization;
 
 namespace Ecom.AutoMapper
 {    
@@ -37,7 +38,13 @@ namespace Ecom.AutoMapper
             CreateMap<ChiTietDonHangDto, chi_tiet_don_hang>();
 
             // account detail
-            CreateMap<accountDetailDto, account>().ReverseMap();
+            CreateMap<account, accountDetailDto>()
+                .ForMember(x => x.ngay_sinh, me => me.MapFrom(src => src.ngay_sinh.HasValue ? src.ngay_sinh.Value.ToString("dd/MM/yyyy") : ""));
+            CreateMap<accountDetailDto, account>()
+                .ForMember(dest => dest.id, opt => opt.Ignore())
+                .ForMember(dest => dest.ngay_sinh, opt =>
+                    opt.MapFrom(src => ConvertNgaySinh(src.ngay_sinh)))
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
             // mã giảm giá
             CreateMap<MaGiamGiaDto, ma_giam_gia>()
@@ -67,6 +74,19 @@ namespace Ecom.AutoMapper
             CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>))
                 .ConvertUsing(typeof(PaginatedListConverter<,>));
         }
+
+        public DateTime? ConvertNgaySinh(string ngaySinh)
+        {
+            if (string.IsNullOrWhiteSpace(ngaySinh))
+                return null;
+
+            string[] formats = { "dd/MM/yyyy", "yyyy-MM-ddTHH:mm:ss.fffZ" }; // Các format hợp lệ
+            DateTime parsedDate;
+
+            bool success = DateTime.TryParseExact(ngaySinh, formats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out parsedDate);
+            return success ? parsedDate : (DateTime?)null;
+        }
+
     }
 
     public class PaginatedListConverter<TSource, TDestination>
@@ -88,5 +108,7 @@ namespace Ecom.AutoMapper
             return new PaginatedList<TDestination>(items, source.TotalRecord, source.PageIndex, source.PageSize);
         }
     }
+
+
 
 }

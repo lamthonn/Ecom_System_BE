@@ -156,6 +156,19 @@ namespace Ecom.Controllers
                 throw new Exception(e.Message);
             }
         }
+        [Authorize]
+        [HttpPut]
+        public async Task<bool> UpdateUser([FromBody] accountDetailDto model)
+        {
+            try
+            {
+                return await _authService.UpdateUser(model);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
         //[HttpGet("check-auth")]
         //public IActionResult CheckAuth()

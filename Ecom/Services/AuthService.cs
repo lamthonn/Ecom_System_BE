@@ -444,5 +444,36 @@ namespace Ecom.Services
             await _context.SaveChangesAsync(new CancellationToken());
             return true;
         }
+        public async Task<bool> UpdateUser(accountDetailDto model)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                _mapper.Map(model, user);
+
+                _context.account.Update(user);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
     }
 }
