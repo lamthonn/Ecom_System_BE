@@ -4,6 +4,7 @@ using Ecom.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecom.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250403134346_add table lich_su_giao_dich")]
+    partial class addtablelich_su_giao_dich
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -509,46 +512,6 @@ namespace Ecom.Migrations
                     b.HasIndex("Accountid");
 
                     b.ToTable("gio_hang");
-                });
-
-            modelBuilder.Entity("Ecom.Entity.lich_su_giao_dich", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("giao_dich")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("loai_giao_dich")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ngay_giao_dich")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("phuong_thuc_giao_dich")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("so_du")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("lich_su_giao_dich");
                 });
 
             modelBuilder.Entity("Ecom.Entity.ma_giam_gia", b =>

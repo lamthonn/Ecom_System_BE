@@ -29,6 +29,7 @@ namespace Ecom.Context
 
         public DbSet<chuong_trinh_marketing> chuong_trinh_marketing { get; set; }
         public DbSet<ngan_hang> ngan_hang { get; set; }
+        public DbSet<lich_su_giao_dich> lich_su_giao_dich { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +67,14 @@ namespace Ecom.Context
 
             modelBuilder.Entity<chi_tiet_don_hang>()
                 .Property(e => e.don_gia)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<lich_su_giao_dich>()
+                .Property(e => e.giao_dich)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<lich_su_giao_dich>()
+                .Property(e => e.so_du)
                 .HasPrecision(18, 2);
 
         }
