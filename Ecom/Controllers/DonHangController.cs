@@ -1,7 +1,10 @@
-﻿using backend_v3.Models;
+﻿using backend_v3.Dto.Common;
+using backend_v3.Models;
+using Ecom.Dto.DonHang;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
 using Ecom.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,6 +66,29 @@ namespace Ecom.Controllers
             {
                 await _service.XuLyDonHangs(request);
                 return NoContent();
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+        [Authorize]
+        [HttpGet]
+        [Route("get-don-hang-by-id")]
+        public async Task<DonHangUserDto> GetDonHangById([FromQuery] Guid id)
+        {
+            try
+            {
+                return await _service.GetDonHangById(id);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+
+        }
+        [Authorize]
+        [HttpGet]
+        [Route("get-don-hang-by-user")]
+        public async Task<PaginatedList<DonHangUserDto>> GetDonHangs([FromQuery] PaginParams param)
+        {
+            try
+            {
+                return await _service.GetDonHangs(param);
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }

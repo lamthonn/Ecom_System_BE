@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using backend_v3.Dto.Common;
 using backend_v3.Models;
 using Ecom.Context;
+using Ecom.Dto.DonHang;
 using Ecom.Dto.QuanLySanPham;
 using Ecom.Dto.VanHanh;
 using Ecom.Entity;
 using Ecom.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 
 namespace Ecom.Services
 {
@@ -13,10 +17,13 @@ namespace Ecom.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public DonHangService(AppDbContext context, IMapper mapper)
+
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public DonHangService(AppDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<PaginatedList<DonHangDto>> GetAll(DonHangDto request)
@@ -144,6 +151,117 @@ namespace Ecom.Services
                 throw new Exception("Không có đơn hàng nào được chọn");
             }
 
+        }
+        public async Task<PaginatedList<DonHangUserDto>> GetDonHangs(PaginParams param)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                // Apply search filter if keySearch is provided
+                var query = _context.don_hang
+                    .Where(dh => dh.account_id == userId);
+
+                if (!string.IsNullOrEmpty(param.keySearch))
+                {
+                    query = query.Where(dh => dh.ma_don_hang.Contains(param.keySearch) || dh.so_dien_thoai.Contains(param.keySearch) || dh.dia_chi.Contains(param.keySearch));
+                }
+
+                // Get total item count
+                var totalItems = await query.CountAsync();
+
+                // Apply pagination before selecting data
+                var paginatedQuery = query
+                    .OrderBy(dh => dh.ngay_mua) // Sorting criteria
+                    .Skip((param.pageNumber - 1) * param.pageSize)
+                    .Take(param.pageSize);
+
+                // Select and map the results into DonHangUserDto
+                var donHangs = paginatedQuery
+                    .Select(dh => new DonHangUserDto
+                    {
+                        id = dh.id,
+                        ma_don_hang = dh.ma_don_hang,
+                        trang_thai = dh.trang_thai,
+                        ngay_mua = dh.ngay_mua,
+                        tong_tien = dh.tong_tien,
+                        thanh_tien = dh.thanh_tien,
+                        so_dien_thoai = dh.so_dien_thoai,
+                        dia_chi = dh.dia_chi,
+                        ChiTietDonHangs = _context.chi_tiet_don_hang
+                                .Where(ctdh => ctdh.don_hang_id == dh.id)
+                                .Select(ct => new ChiTietDonHangUserDto
+                                {
+                                    id = ct.id,
+                                    san_pham_id = ct.san_pham_id,
+                                    ten_san_pham = _context.san_pham.FirstOrDefault(x => x.id == ct.san_pham_id).ten_san_pham,
+                                    thanh_tien = ct.thanh_tien,
+                                    don_gia = ct.don_gia,
+                                    so_luong = ct.so_luong
+                                })
+                                .ToList()
+                    });
+
+                // Create the PaginatedList object with the result
+                return await PaginatedList<DonHangUserDto>.Create(donHangs, param.pageNumber, param.pageSize);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi ghi get đơn hàng: " + ex.Message, ex);
+            }
+        }
+
+        public async Task<DonHangUserDto> GetDonHangById(Guid id)
+        {
+            try
+            {
+                var dh = await _context.don_hang
+                    .FirstOrDefaultAsync(dh => dh.id == id);
+                if (dh == null) throw new Exception("Đơn hàng không tồn tại");
+                var result = new DonHangUserDto
+                {
+                    id = dh.id,
+                    ma_don_hang = dh.ma_don_hang,
+                    trang_thai = dh.trang_thai,
+                    ngay_mua = dh.ngay_mua,
+                    tong_tien = dh.tong_tien,
+                    thanh_tien = dh.thanh_tien,
+                    so_dien_thoai = dh.so_dien_thoai,
+                    dia_chi = dh.dia_chi,
+                    dvvc_id = dh.dvvc_id,
+                    ten_don_vi_cc = _context.dvvc.FirstOrDefault(dvvc => dvvc.id == dh.dvvc_id).Name,
+                    ChiTietDonHangs = _context.chi_tiet_don_hang
+                        .Where(ctdh => ctdh.don_hang_id == dh.id)
+                        .Select(ct => new ChiTietDonHangUserDto
+                        {
+                            id = ct.id,
+                            san_pham_id = ct.san_pham_id,
+                            ten_san_pham = _context.san_pham.FirstOrDefault(x => x.id == ct.san_pham_id).ten_san_pham,
+                            thanh_tien = ct.thanh_tien,
+                            don_gia = ct.don_gia,
+                            so_luong = ct.so_luong
+                        })
+                        .ToList()
+                };
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi ghi get đơn hàng" + ex.Message, ex);
+            }
         }
     }
 }

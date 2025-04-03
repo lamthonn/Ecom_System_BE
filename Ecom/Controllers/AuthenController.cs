@@ -37,7 +37,7 @@ namespace Ecom.Controllers
         }
 
         [HttpPost]
-        public Task<string> Login(accountDto request)
+        public Task<loginDto> Login(accountDto request)
         {
             try
             {
@@ -150,6 +150,19 @@ namespace Ecom.Controllers
             try
             {
                 return await _authService.blockUser(id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        [Authorize]
+        [HttpPut]
+        public async Task<bool> UpdateUser([FromBody] accountDetailDto model)
+        {
+            try
+            {
+                return await _authService.UpdateUser(model);
             }
             catch (Exception e)
             {

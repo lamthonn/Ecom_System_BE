@@ -106,47 +106,52 @@ namespace Ecom.Services
             return salt;
         }
 
-        public async Task<string> Login(accountDto request)
+        public async Task<loginDto> Login(accountDto request)
         {
             try
             {
-                if (string.IsNullOrEmpty(request.tai_khoan) || string.IsNullOrEmpty(request.mat_khau))
+                if (!string.IsNullOrEmpty(request.tai_khoan) || !string.IsNullOrEmpty(request.mat_khau))
                 {
-                    return "Tài khoản và mật khẩu không được để trống!";
-                }
+                    if (request.is_super_admin == false)
+                    {
+                        var user = _context.account.FirstOrDefault(x => x.tai_khoan == request.tai_khoan);
 
-                var user = await _context.account.FirstOrDefaultAsync(x => x.tai_khoan == request.tai_khoan);
-                if (user == null)
+                        if (user != null)
+                        {
+                            // Tạo lại hash mật khẩu từ mật khẩu người dùng nhập vào và salt trong DB
+                            var salt = Convert.FromBase64String(user.salt!); // Salt đã lưu trong DB
+                            var hashedPassword = GetPBKDF2(request.mat_khau, salt);
+                            if (hashedPassword == user.mat_khau)
+                            {
+                                var jwtToken = GenerateJwtToken(user);
+                                var refreshToken = GenerateRefreshToken();
+
+                                // Lưu Refresh Token vào DB
+                                user.RefreshToken = refreshToken;
+                                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddHours(3);
+                                _context.Update(user);
+                                await _context.SaveChangesAsync();
+                                return new loginDto { token = jwtToken, refreshToken = refreshToken };
+                            }
+                            else
+                            {
+                                throw new Exception("Mật khẩu không đúng");
+                            }
+                        }
+                        else
+                        {
+                            throw new Exception("Không tìm thấy tài khoản");
+                        }
+                    }
+                    else
+                    {
+                        throw new Exception("Tài khoản và mật khẩu không đúng");
+                    }
+                }
+                else
                 {
-                    return "Tài khoản và mật khẩu không đúng!";
+                    throw new Exception("Tài khoản và mật khẩu không được để trống");
                 }
-
-                var salt = Convert.FromBase64String(user.salt);
-                var hashedPassword = GetPBKDF2(request.mat_khau, salt);
-
-                if (hashedPassword != user.mat_khau)
-                {
-                    return "Tài khoản và mật khẩu không đúng!";
-                }
-
-                var claims = new List<Claim> {
-            new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]!),
-            new Claim("id", user.id.ToString()),
-            new Claim("tai_khoan", user.tai_khoan),
-            new Claim("role", user.is_super_admin.ToString()!)
-        };
-
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-                var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                var token = new JwtSecurityToken(
-                    _configuration["Jwt:Issuer"],
-                    _configuration["Jwt:Audience"],
-                    claims,
-                    expires: DateTime.UtcNow.AddMinutes(120),
-                    signingCredentials: signIn
-                );
-
-                return new JwtSecurityTokenHandler().WriteToken(token);
             }
             catch (Exception e)
             {
@@ -154,7 +159,7 @@ namespace Ecom.Services
             }
         }
 
-        async public Task<loginDto> LoginAdmin(accountDto request)
+        public async Task<loginDto> LoginAdmin(accountDto request)
         {
             try
             {
@@ -439,5 +444,36 @@ namespace Ecom.Services
             await _context.SaveChangesAsync(new CancellationToken());
             return true;
         }
+        public async Task<bool> UpdateUser(accountDetailDto model)
+        {
+            try
+            {
+                var httpContext = _httpContextAccessor.HttpContext;
+                if (httpContext == null)
+                    throw new Exception("Không thể truy xuất HttpContext");
+
+                var userIdClaim = httpContext.User.FindFirst("id");
+                if (userIdClaim == null)
+                    throw new Exception("Không tìm thấy ID người dùng trong token");
+
+                var userId = Guid.Parse(userIdClaim.Value);
+                var user = await _context.account.FirstOrDefaultAsync(x => x.id == userId);
+
+                if (user == null)
+                    throw new Exception("Không tìm thấy tài khoản");
+
+                _mapper.Map(model, user);
+
+                _context.account.Update(user);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
     }
 }

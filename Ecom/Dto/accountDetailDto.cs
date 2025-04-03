@@ -4,7 +4,7 @@
     {
         public Guid id { get; set; }
         public string? ten { get; set; }
-        public DateTime? ngay_sinh { get; set; } = new DateTime(1, 1, 0001);
+        public string? ngay_sinh { get; set; }
         public string? dia_chi { get; set; }
         public bool? gioi_tinh { get; set; }
         public string? email { get; set; }

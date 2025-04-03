@@ -336,7 +336,9 @@ namespace Ecom.Services
                     sku = x.sku,
                     so_luong = x.so_luong,
                     mo_ta = x.mo_ta,
+                    luot_ban = _context.san_pham.Where(x => x.ma_san_pham == ma).Sum(a=> a.luot_ban),
                     xuat_xu = x.xuat_xu,
+                    rate = Convert.ToDecimal(_context.danh_gia.Where(a => a.ma_san_pham == x.ma_san_pham).Average(b => b.danh_gia_chat_luong)),
                     ds_anh_san_pham = _context.anh_san_pham.Where(ls => ls.ma_san_pham == x.ma_san_pham).Select(y => y.duong_dan).ToList(),
                     ls_phan_loai = ls_phan_loai.ToList()
                 }).ToList();

@@ -45,6 +45,7 @@ builder.Services.AddTransient<INganHangService, NganHangService>();
 builder.Services.AddTransient<IPhieuNhapKhoService, PhieuNhapKhoService>();
 builder.Services.AddTransient<IDonHangService, DonHangService>();
 builder.Services.AddTransient<IDoanhThuService, DoanhThuService>();
+builder.Services.AddTransient<IGioHangService, GioHangService>();
 builder.Services.AddTransient<SaveFileCommon>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
