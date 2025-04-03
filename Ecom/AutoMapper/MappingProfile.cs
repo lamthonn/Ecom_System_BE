@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using backend_v3.Models;
 using Ecom.Dto;
+using Ecom.Dto.GioHang;
 using Ecom.Dto.KhachHang;
 using Ecom.Dto.ProductTest;
 using Ecom.Dto.QuanLySanPham;
@@ -64,6 +65,10 @@ namespace Ecom.AutoMapper
             //chi tiết phiếu nhập
             CreateMap<chi_tiet_phieu_nhap_kho, ChiTietPhieuNhapDto>();
             CreateMap<ChiTietPhieuNhapDto, chi_tiet_phieu_nhap_kho>();
+
+            //giỏ hàng
+            CreateMap<gio_hang, GioHangDto>();
+            CreateMap<GioHangDto, gio_hang>();
 
             // Định nghĩa ánh xạ chung cho PaginatedList<T>
             CreateMap(typeof(PaginatedList<>), typeof(PaginatedList<>))
