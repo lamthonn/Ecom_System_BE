@@ -24,6 +24,10 @@ namespace Ecom.AutoMapper
             CreateMap<account, KhachHangDto>()
                 .ReverseMap();
 
+            // đánh giá
+            CreateMap<danh_gia, DanhGiaDto>()
+                .ReverseMap();
+
             //sản phẩm
             CreateMap<san_pham, SanPhamDto>()
                 .ForMember(dest => dest.ds_anh_san_pham, opt => opt.MapFrom(src => src.ds_anh_san_pham!.Where(x=> x.ma_san_pham == src.ma_san_pham))) 
