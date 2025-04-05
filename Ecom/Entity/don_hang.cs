@@ -14,6 +14,7 @@ namespace Ecom.Entity
         public decimal thanh_tien { get; set; }
         public string? so_dien_thoai { get; set; }
         public string? dia_chi { get; set; }
+        public bool? is_danh_gia { get; set; }
         public virtual account? Account { get; set; }
         public virtual dvvc? Dvvc { get; set; }
         

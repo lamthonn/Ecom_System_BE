@@ -10,7 +10,8 @@ namespace Ecom.Interfaces
         public Task<PaginatedList<DonHangDto>> GetAll(DonHangDto request);
         public Task XuLyDonHang(string id, DonHangDto request);
         public Task XuLyDonHangs(List<DonHangDto> request);
-        public Task<PaginatedList<DonHangUserDto>> GetDonHangs(PaginParams param);
+        public Task<PaginatedList<DonHangUserDto>> GetDonHangs(PaginParams param, int trang_thai);
         public Task<DonHangUserDto> GetDonHangById(Guid id);
+        public Task<bool> ChuyenTrangThaiDonHang(Guid id, int TrangThai);
     }
 }

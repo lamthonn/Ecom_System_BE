@@ -84,11 +84,22 @@ namespace Ecom.Controllers
         [Authorize]
         [HttpGet]
         [Route("get-don-hang-by-user")]
-        public async Task<PaginatedList<DonHangUserDto>> GetDonHangs([FromQuery] PaginParams param)
+        public async Task<PaginatedList<DonHangUserDto>> GetDonHangs([FromQuery] PaginParams param, [FromQuery] int trang_thai)
         {
             try
             {
-                return await _service.GetDonHangs(param);
+                return await _service.GetDonHangs(param, trang_thai);
+            }
+            catch (Exception ex) { throw new Exception(ex.Message); }
+        }
+        [Authorize]
+        [HttpPut]
+        [Route("chuyen-trang-thai-don-hang")]
+        public async Task<bool> ChuyenTrangThaiDonHang([FromQuery] Guid id, [FromQuery] int TrangThai)
+        {
+            try
+            {
+                return await _service.ChuyenTrangThaiDonHang(id, TrangThai);
             }
             catch (Exception ex) { throw new Exception(ex.Message); }
         }

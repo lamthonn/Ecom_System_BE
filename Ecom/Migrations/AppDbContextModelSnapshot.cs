@@ -344,6 +344,9 @@ namespace Ecom.Migrations
                     b.Property<string>("noi_dung_danh_gia")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("noi_dung_phan_hoi")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("san_pham_id")
                         .HasColumnType("uniqueidentifier");
 
@@ -422,6 +425,9 @@ namespace Ecom.Migrations
 
                     b.Property<Guid>("dvvc_id")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool?>("is_danh_gia")
+                        .HasColumnType("bit");
 
                     b.Property<string>("ma_don_hang")
                         .IsRequired()

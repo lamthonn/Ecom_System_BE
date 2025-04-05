@@ -11,6 +11,7 @@ namespace Ecom.Entity
         public string? ma_san_pham { get; set; }
         public int danh_gia_chat_luong { get; set; }
         public string? noi_dung_danh_gia { get; set; }
+        public string? noi_dung_phan_hoi { get; set; }
         public virtual san_pham? San_Pham { get; set; }
         public virtual account? Account { get; set; }
     }

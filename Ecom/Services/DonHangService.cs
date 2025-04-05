@@ -152,7 +152,7 @@ namespace Ecom.Services
             }
 
         }
-        public async Task<PaginatedList<DonHangUserDto>> GetDonHangs(PaginParams param)
+        public async Task<PaginatedList<DonHangUserDto>> GetDonHangs(PaginParams param, int trang_thai)
         {
             try
             {
@@ -178,6 +178,10 @@ namespace Ecom.Services
                 {
                     query = query.Where(dh => dh.ma_don_hang.Contains(param.keySearch) || dh.so_dien_thoai.Contains(param.keySearch) || dh.dia_chi.Contains(param.keySearch));
                 }
+                if(trang_thai != 0)
+                {
+                    query = query.Where(x => x.trang_thai == trang_thai);
+                }
 
                 // Get total item count
                 var totalItems = await query.CountAsync();
@@ -200,6 +204,7 @@ namespace Ecom.Services
                         thanh_tien = dh.thanh_tien,
                         so_dien_thoai = dh.so_dien_thoai,
                         dia_chi = dh.dia_chi,
+                        is_danh_gia = dh.is_danh_gia,
                         ChiTietDonHangs = _context.chi_tiet_don_hang
                                 .Where(ctdh => ctdh.don_hang_id == dh.id)
                                 .Select(ct => new ChiTietDonHangUserDto
@@ -241,6 +246,7 @@ namespace Ecom.Services
                     so_dien_thoai = dh.so_dien_thoai,
                     dia_chi = dh.dia_chi,
                     dvvc_id = dh.dvvc_id,
+                    is_danh_gia = dh.is_danh_gia,
                     ten_don_vi_cc = _context.dvvc.FirstOrDefault(dvvc => dvvc.id == dh.dvvc_id).Name,
                     ChiTietDonHangs = _context.chi_tiet_don_hang
                         .Where(ctdh => ctdh.don_hang_id == dh.id)
@@ -263,5 +269,24 @@ namespace Ecom.Services
                 throw new Exception("Lỗi ghi get đơn hàng" + ex.Message, ex);
             }
         }
+
+        public async Task<bool> ChuyenTrangThaiDonHang(Guid id, int TrangThai)
+        {
+            try
+            {
+                var dh = await _context.don_hang
+                    .FirstOrDefaultAsync(dh => dh.id == id);
+                if (dh == null) throw new Exception("Đơn hàng không tồn tại");
+                dh.trang_thai = TrangThai;
+                _context.don_hang.Update(dh);
+                await _context.SaveChangesAsync(new CancellationToken());
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi khi hủy đơn hàng" + ex.Message, ex);
+            }
+        }
+            
     }
 }
