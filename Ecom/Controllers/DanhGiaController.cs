@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ecom.Dto;
+using Ecom.Dto.QuanLySanPham;
 using Ecom.Entity;
 using Ecom.Interfaces;
 using Ecom.Services;
@@ -26,6 +27,20 @@ namespace Ecom.Controllers
             try
             {
                 return await _danhGiaService.DanhGia(listDanhGia, id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("get-danh-gia/{ma}")]
+        public async Task<List<DanhGiaDto>> GetDanhGia([FromRoute]string ma)
+        {
+            try
+            {
+                return await _danhGiaService.GetBySanPham(ma);
             }
             catch (Exception e)
             {

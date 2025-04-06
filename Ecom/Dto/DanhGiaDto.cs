@@ -1,4 +1,6 @@
-﻿namespace Ecom.Dto
+﻿using Ecom.Dto.QuanLySanPham;
+
+namespace Ecom.Dto
 {
     public class DanhGiaDto
     {
@@ -9,5 +11,7 @@
         public int danh_gia_chat_luong { get; set; }
         public string? noi_dung_danh_gia { get; set; }
         public string? noi_dung_phan_hoi { get; set; }
+        public SanPhamDto? san_pham { get; set; }
+        public accountDto? nguoi_dung { get; set; }
     }
 }
