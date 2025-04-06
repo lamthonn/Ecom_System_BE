@@ -11,6 +11,7 @@ using Ecom.Dto.ProductTest;
 using Ecom.AutoMapper;
 using Ecom.Services.Common;
 using Microsoft.Extensions.FileProviders;
+using Ecom.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
@@ -48,7 +49,13 @@ builder.Services.AddTransient<IDoanhThuService, DoanhThuService>();
 builder.Services.AddTransient<IGioHangService, GioHangService>();
 builder.Services.AddTransient<IDanhGiaService, DanhGiaService>();
 builder.Services.AddTransient<SaveFileCommon>();
+builder.Services.AddScoped<StripePaymentService>();
+
 builder.Services.AddHttpContextAccessor();
+
+// Configure Stripe
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+Stripe.StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
