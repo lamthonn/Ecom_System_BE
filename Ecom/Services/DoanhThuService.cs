@@ -1,8 +1,11 @@
-﻿using Ecom.Context;
+﻿using backend_v3.Dto.Common;
+using backend_v3.Models;
+using Ecom.Context;
 using Ecom.Dto;
 using Ecom.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Ecom.Services
 {
@@ -20,12 +23,12 @@ namespace Ecom.Services
             try
             {
                 // Mặc định lấy dữ liệu 30 ngày gần nhất nếu không có tham số
-                startDate ??= DateTime.UtcNow.AddDays(-30);
-                endDate ??= DateTime.UtcNow;
+                startDate = DateTime.UtcNow.AddDays(-30);
+                endDate = DateTime.UtcNow.AddHours(23);
 
                 // Lọc đơn hàng theo khoảng thời gian
                 var ordersQuery = _context.don_hang
-                    .Where(o => o.ngay_mua >= startDate && o.ngay_mua <= endDate);
+                    .Where(o => o.ngay_mua >= startDate && o.ngay_mua <= endDate && o.trang_thai == 4);
 
                 // Tổng doanh thu
                 var totalRevenue = await ordersQuery.SumAsync(o => o.thanh_tien);
@@ -136,20 +139,18 @@ namespace Ecom.Services
         {
             try
             {
-                startDate ??= DateTime.UtcNow.AddDays(-30);
-                endDate ??= DateTime.UtcNow;
+                startDate = DateTime.UtcNow.AddDays(-30);
+                endDate = DateTime.UtcNow.AddHours(23);
 
                 var ordersQuery = _context.don_hang
-                    .Where(o => o.ngay_mua >= startDate && o.ngay_mua <= endDate);
+                    .Where(o => o.ngay_mua >= startDate && o.ngay_mua <= endDate && o.trang_thai == 1);
+                var ordersSuccess = _context.don_hang
+                    .Where(o => o.ngay_mua >= startDate && o.ngay_mua <= endDate && o.trang_thai == 4);
 
-                var totalRevenue = await ordersQuery.SumAsync(o => o.thanh_tien);
+                var totalRevenue = await ordersSuccess.SumAsync(o => o.thanh_tien);
                 var totalOrders = await ordersQuery.CountAsync();
-                var totalCustomers = await _context.account
-                    .Where(x => x.Created >= startDate && x.Created <=endDate && x.is_super_admin == false)
-                    .CountAsync();
-                var totalProducts = await _context.san_pham
-                    .Where(x => x.Created >= startDate && x.Created <= endDate)
-                    .CountAsync();
+                var totalCustomers = await _context.account.Where(x => x.is_super_admin == false).CountAsync();
+                var totalProducts = await _context.san_pham.Select(x => x.ma_san_pham).Distinct().CountAsync();
 
                 var refundOrders = await ordersQuery.Where(o => o.trang_thai == 5).CountAsync();
                 var refundRate = totalOrders > 0 ? (double)refundOrders / totalOrders * 100 : 0;
@@ -166,6 +167,38 @@ namespace Ecom.Services
             catch (Exception ex)
             {
                 throw new Exception("Lỗi khi lấy dữ liệu thống kê Dashboard", ex);
+            }
+        }
+
+        public async Task<PaginatedList<LichSuGiaoDichDto>> GetSoDu(LichSuGiaoDichDto request)
+        {
+            try
+            {
+                DateTime startDate = request.startDate ?? DateTime.Now.AddHours(7);
+                DateTime endDate = request.endDate != null ? request.endDate!.Value.AddHours(23) : DateTime.Now.AddHours(7);
+
+                var SoDu = await _context.lich_su_giao_dich.OrderByDescending(x => x.ngay_giao_dich).FirstOrDefaultAsync();
+
+                var query = _context.lich_su_giao_dich
+                    .Where(x => x.ngay_giao_dich >= startDate && x.ngay_giao_dich <= endDate && x.status != "Pending")
+                    .OrderByDescending(x => x.ngay_giao_dich)
+                    .Select(x => new LichSuGiaoDichDto
+                    {
+                        id = x.id,
+                        ngay_giao_dich = x.ngay_giao_dich,
+                        giao_dich = x.giao_dich,
+                        loai_giao_dich = x.loai_giao_dich,
+                        phuong_thuc_giao_dich = x.phuong_thuc_giao_dich,
+                        status = x.status,
+                        so_du = SoDu != null ? SoDu.so_du : 0,
+                    });
+
+                var result = await PaginatedList<LichSuGiaoDichDto>.Create(query, request.pageNumber, request.pageSize);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
             }
         }
     }

@@ -25,7 +25,7 @@ namespace Ecom.Services
                 {
                     PriceData = new SessionLineItemPriceDataOptions
                     {
-                        UnitAmount = (long?)(param.priceInCents * 100), //Convert to long and multiply by 100
+                        UnitAmount = (long?)(param.priceInCents), //Convert to long and multiply by 100
                         Currency = "vnd",
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {

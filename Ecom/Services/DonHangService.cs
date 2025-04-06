@@ -56,7 +56,16 @@ namespace Ecom.Services
                                   CreatedBy = x.CreatedBy,
                                   LastModifiedBy = x.LastModifiedBy,
                                   anh_dai_dien = AnhDaiDien,
-                                  tai_khoan = _context.account.FirstOrDefault(y => y.id == x.account_id),
+                                  tai_khoan = new TaiKhoanDto
+                                  {
+                                      dia_chi = _context.account.FirstOrDefault(a => a.id == x.account_id)!.dia_chi,
+                                      ten = _context.account.FirstOrDefault(a => a.id == x.account_id)!.ten,
+                                      dvvc_id = _context.account.FirstOrDefault(a => a.id == x.account_id)!.dvvc_id,
+                                      email = _context.account.FirstOrDefault(a => a.id == x.account_id)!.email,
+                                      gioi_tinh = _context.account.FirstOrDefault(a => a.id == x.account_id)!.gioi_tinh,
+                                      so_dien_thoai = _context.account.FirstOrDefault(a => a.id == x.account_id)!.so_dien_thoai,
+                                      trang_thai = _context.account.FirstOrDefault(a => a.id == x.account_id)!.trang_thai,
+                                  },
                                   ds_chi_tiet_don_hang = _context.chi_tiet_don_hang.Where(z => z.don_hang_id == x.id).Select(a => new ChiTietDonHangDto
                                   {
                                       don_hang_id = a.don_hang_id,

@@ -31,7 +31,7 @@ namespace Ecom.Controllers.common
             try
             {
                 var session = _paymentService.CreateCheckoutSession(req);
-                var theLastRecord = _context.lich_su_giao_dich.OrderByDescending(p => p.Created).FirstOrDefault();
+                var theLastRecord = _context.lich_su_giao_dich.Where(x=> x.status == "Success").OrderByDescending(p => p.Created).FirstOrDefault();
                 var newGiaoDich = new lich_su_giao_dich
                 {
                     id = Guid.NewGuid(),
@@ -58,50 +58,75 @@ namespace Ecom.Controllers.common
         [HttpPost("success")]
         public async Task<IActionResult> Success([FromBody] PaymentParam param)
         {
-            var paymentRecord = await _context.lich_su_giao_dich.FirstOrDefaultAsync(p => p.stripeSessionId == param.stripeSessionId);
-            if (paymentRecord != null)
+            try
             {
-                var DonHang = param.donHang;
-                //xử lý đơn hàng
-                var newDonHang = new don_hang
+                var paymentRecord = await _context.lich_su_giao_dich.FirstOrDefaultAsync(p => p.stripeSessionId == param.stripeSessionId);
+                if (paymentRecord != null)
                 {
-                    id = Guid.NewGuid(),
-                    ma_don_hang = GenerateOrderId(),
-                    account_id = Guid.Parse(param.userId!),
-                    trang_thai = 1,
-                    Created = DateTime.Now,
-                    dia_chi = DonHang!.tai_khoan!.dia_chi,
-                    dvvc_id = GetRandomDvvcId(),
-                    so_dien_thoai = DonHang!.tai_khoan!.so_dien_thoai,
-                    ngay_mua = DateTime.Now,
-                    tong_tien = param.priceInCents ?? 0,
-                    thanh_tien = param.priceInCents ?? 0,
-                };
-                _context.don_hang.Add(newDonHang);
-
-                var  chiTietDonHang = new List<chi_tiet_don_hang>();
-                DonHang.ds_chi_tiet_don_hang!.ForEach(x =>
-                {
-                    var newCT = new chi_tiet_don_hang
+                    var DonHang = param.donHang;
+                    //xử lý đơn hàng
+                    var newDonHang = new don_hang
                     {
                         id = Guid.NewGuid(),
-                        don_hang_id = newDonHang.id,
-                        san_pham_id = x.san_pham_id ?? Guid.NewGuid(),
+                        ma_don_hang = GenerateOrderId(),
+                        account_id = Guid.Parse(param.userId!),
+                        trang_thai = 1,
                         Created = DateTime.Now,
-                        don_gia = x.don_gia,
-                        so_luong = x.so_luong,
-                        thanh_tien = x.thanh_tien ?? 0,
-                        LastModified = DateTime.Now,
+                        dia_chi = DonHang!.tai_khoan!.dia_chi,
+                        dvvc_id = GetRandomDvvcId(),
+                        so_dien_thoai = DonHang!.tai_khoan!.so_dien_thoai,
+                        ngay_mua = DateTime.Now,
+                        tong_tien = param.priceInCents ?? 0,
+                        thanh_tien = param.priceInCents ?? 0,
                     };
-                    chiTietDonHang.Add(newCT);
-                });
+                    _context.don_hang.Add(newDonHang);
 
-                paymentRecord.status = "Success";
-                await _context.SaveChangesAsync();
+                    var chiTietDonHang = new List<chi_tiet_don_hang>();
+                    DonHang.ds_chi_tiet_don_hang!.ForEach(x =>
+                    {
+                        var newCT = new chi_tiet_don_hang
+                        {
+                            id = Guid.NewGuid(),
+                            don_hang_id = newDonHang.id,
+                            san_pham_id = x.san_pham_id ?? Guid.NewGuid(),
+                            Created = DateTime.Now,
+                            don_gia = x.don_gia,
+                            so_luong = x.so_luong,
+                            thanh_tien = x.thanh_tien ?? 0,
+                            LastModified = DateTime.Now,
+                        };
+                        chiTietDonHang.Add(newCT);
+                    });
+                    _context.chi_tiet_don_hang.AddRange(chiTietDonHang);
+                    // Xóa sản phẩm khỏi giỏ hàng
+                    var cartItems = await _context.gio_hang.FirstOrDefaultAsync(c => c.account_id == Guid.Parse(param.userId!));
+
+                    if (cartItems != null)
+                    {
+                        var cartItemDetail = _context.chi_tiet_gio_hang
+                        .Where(c => c.gio_hang_id == cartItems!.id)
+                        .ToList();
+                        // Nếu bạn muốn xóa chỉ những sản phẩm đã mua, bạn cần lọc dựa trên DonHang.ds_chi_tiet_don_hang
+                        var CTIds = DonHang.ds_chi_tiet_don_hang!.Select(x => x.san_pham_id);
+                        foreach (var item in cartItemDetail)
+                        {
+                            var productToRv = cartItemDetail.Where(x => CTIds.Contains(x.san_pham_id));
+                            _context.chi_tiet_gio_hang.RemoveRange(productToRv);
+                        }
+                    }
+
+                    paymentRecord.status = "Success";
+                    await _context.SaveChangesAsync();
+                }
+
+                // Redirect to a success page or return success response
+                return Ok("Payment successful.");
             }
-
-            // Redirect to a success page or return success response
-            return Ok("Payment successful.");
+            catch (Exception ex)
+            {
+                // Handle any errors that occur during the payment process
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpGet("cancel")]
