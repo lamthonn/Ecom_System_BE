@@ -6,5 +6,6 @@ namespace Ecom.Interfaces
     public interface IDanhGiaService
     {
         public Task<bool> DanhGia(List<DanhGiaInputDto> listDanhGia, Guid donHangId);
+        //public Task<List<DanhGiaDto> GetAllData(List<DanhGiaInputDto> listDanhGia, Guid donHangId);
     }
 }

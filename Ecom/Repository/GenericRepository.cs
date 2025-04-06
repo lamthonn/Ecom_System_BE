@@ -11,6 +11,7 @@ using OfficeOpenXml;
 using System.Linq.Expressions;
 using Ecom.Dto.Common;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Ecom.Entity;
 
 namespace Ecom.Repository
 {
@@ -78,10 +79,29 @@ namespace Ecom.Repository
         }
 
 
+        private IQueryable<T> IncludeRelatedEntities(IQueryable<T> query)
+        {
+            if (typeof(T) == typeof(danh_gia))
+            {
+                var danhGiaQuery = query as IQueryable<danh_gia>;
+
+                if (danhGiaQuery != null)
+                {
+                    var includedQuery = danhGiaQuery
+                        .Include(d => d.San_Pham)
+                        .Include(d => d.Account);
+
+                    return includedQuery as IQueryable<T>;
+                }
+            }
+
+            return query;
+        }
 
         public async Task<PaginatedList<TDto>> GetAllAsync<TDto>(PaginParams paginParams)
         {
-            var query = _dbSet.AsQueryable();
+            var query = IncludeRelatedEntities(_dbSet.AsQueryable());
+
 
             if (!string.IsNullOrEmpty(paginParams.keySearch))
             {

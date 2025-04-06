@@ -26,6 +26,7 @@ namespace Ecom.AutoMapper
 
             // đánh giá
             CreateMap<danh_gia, DanhGiaDto>()
+                .ForMember(dest => dest.San_Pham, opt => opt.MapFrom(src => src.San_Pham))
                 .ReverseMap();
 
             //sản phẩm
