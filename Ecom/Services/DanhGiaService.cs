@@ -41,9 +41,12 @@ namespace Ecom.Services
                     {
                         id = Guid.NewGuid(),
                         san_pham_id = item.id,
+                        ma_san_pham = item.ma_san_pham,
                         account_id = userId,
                         danh_gia_chat_luong = item.rating,
                         noi_dung_danh_gia = item.reviewText,
+                        don_hang_id = item.don_hang_id,
+                        ma_don_hang = item.ma_don_hang,
                     };
                     _context.danh_gia.Add(newItem);
                 }
@@ -73,7 +76,7 @@ namespace Ecom.Services
                     dataQuery = dataQuery.Where(x => x.ma_san_pham.Contains(request.ma_san_pham));
                 }
 
-                if (request.muc_danh_gia.HasValue)
+                if (request.muc_danh_gia.HasValue && request.muc_danh_gia.Value != 0)
                 {
                     dataQuery = dataQuery.Where(x => x.danh_gia_chat_luong == request.muc_danh_gia.Value);
                 }
@@ -84,7 +87,7 @@ namespace Ecom.Services
                     {
                         id = x.id,
                         account_id = x.account_id,
-                        ten_khach_hang = _context.account.FirstOrDefault(ac => ac.id == x.account_id).ten,
+                        ten_khach_hang = _context.account.FirstOrDefault(ac => ac.id == x.account_id).ten,                       
                         danh_gia_chat_luong = x.danh_gia_chat_luong,
                         ma_san_pham = x.ma_san_pham,
                         noi_dung_danh_gia = x.noi_dung_danh_gia,
@@ -92,6 +95,7 @@ namespace Ecom.Services
                         noi_dung_phan_hoi = x.noi_dung_phan_hoi,
                         san_pham_id = x.san_pham_id,
                         ten_san_pham = _context.san_pham.FirstOrDefault(sp => sp.ma_san_pham == x.ma_san_pham).ten_san_pham,
+                        ma_don_hang = _context.don_hang.FirstOrDefault(dh => dh.id == x.don_hang_id).ma_don_hang
                     });
 
                 var result = await PaginatedList<DanhGiaDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
@@ -106,6 +110,7 @@ namespace Ecom.Services
         {
             public string? ma_san_pham { get; set; }
             public int? muc_danh_gia { get; set; }
+            public string? KeySearch { get; set; }
         }
     }
 }

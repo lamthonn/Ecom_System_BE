@@ -33,7 +33,7 @@ namespace Ecom.Controllers
         [HttpPost]
         [Authorize]
         [Route("created")]
-        public Task Created(ChiTietGioHangDto request)
+        public Task Created([FromBody]ChiTietGioHangDto request)
         {
             try
             {

@@ -36,7 +36,7 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
-
+builder.Services.AddHttpClient();
 
 //service
 builder.Services.AddTransient<IAuthService, AuthService>();
@@ -50,6 +50,7 @@ builder.Services.AddTransient<IGioHangService, GioHangService>();
 builder.Services.AddTransient<IDanhGiaService, DanhGiaService>();
 builder.Services.AddTransient<SaveFileCommon>();
 builder.Services.AddScoped<StripePaymentService>();
+builder.Services.AddTransient<IZaloPaymentService, ZaloPaymentService>();
 
 builder.Services.AddHttpContextAccessor();
 

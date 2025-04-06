@@ -14,6 +14,7 @@ namespace Ecom.Dto
         public string? noi_dung_danh_gia { get; set; }
         public string? noi_dung_phan_hoi { get; set; }
         public string? ngay_danh_gia { get; set; }
+        public string? ma_don_hang { get; set; }
        
     }
 }

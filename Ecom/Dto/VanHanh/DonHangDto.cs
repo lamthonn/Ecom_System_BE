@@ -1,5 +1,6 @@
 ﻿using backend_v3.Dto.Common;
 using Ecom.Entity;
+using System.ComponentModel;
 
 namespace Ecom.Dto.VanHanh
 {
@@ -15,7 +16,7 @@ namespace Ecom.Dto.VanHanh
         public decimal? thanh_tien { get; set; }
         public string? anh_dai_dien { get; set; }
         public List<ChiTietDonHangDto>? ds_chi_tiet_don_hang { get; set; }
-        public account? tai_khoan { get; set; }
+        public TaiKhoanDto? tai_khoan { get; set; }
         public dvvc? dvvc { get; set; }
     }
 
@@ -29,5 +30,17 @@ namespace Ecom.Dto.VanHanh
         public decimal? thanh_tien { get; set; }
         public decimal? don_gia { get; set; }
         public int? so_luong { get; set; }
+    }
+
+    public class TaiKhoanDto
+    {
+        public string? ten { get; set; }
+        public string? dia_chi { get; set; }
+        public bool? gioi_tinh { get; set; }
+        public string? email { get; set; }
+        public bool? trang_thai { get; set; }
+        public string? so_dien_thoai { get; set; }
+        public Guid? dvvc_id { get; set; }
+        public virtual dvvc? dvvc { get; set; }
     }
 }
