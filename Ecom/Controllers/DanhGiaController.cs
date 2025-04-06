@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using backend_v3.Models;
 using Ecom.Dto;
 using Ecom.Entity;
 using Ecom.Interfaces;
 using Ecom.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static Ecom.Services.DanhGiaService;
 
 namespace Ecom.Controllers
 {
@@ -26,6 +28,19 @@ namespace Ecom.Controllers
             try
             {
                 return await _danhGiaService.DanhGia(listDanhGia, id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        [Authorize]
+        [HttpGet("get-all-paging")]
+        public async Task<PaginatedList<DanhGiaDto>> GetAllPaging([FromQuery] DanhGiaParams request)
+        {
+            try
+            {
+                return await _danhGiaService.GetAllPaging(request);
             }
             catch (Exception e)
             {

@@ -338,6 +338,15 @@ namespace Ecom.Migrations
                     b.Property<int>("danh_gia_chat_luong")
                         .HasColumnType("int");
 
+                    b.Property<Guid?>("don_hang_id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("don_hangid")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ma_don_hang")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ma_san_pham")
                         .HasColumnType("nvarchar(max)");
 
@@ -355,6 +364,8 @@ namespace Ecom.Migrations
                     b.HasIndex("Accountid");
 
                     b.HasIndex("San_Phamid");
+
+                    b.HasIndex("don_hangid");
 
                     b.ToTable("danh_gia");
                 });
@@ -897,9 +908,15 @@ namespace Ecom.Migrations
                         .WithMany()
                         .HasForeignKey("San_Phamid");
 
+                    b.HasOne("Ecom.Entity.don_hang", "don_hang")
+                        .WithMany()
+                        .HasForeignKey("don_hangid");
+
                     b.Navigation("Account");
 
                     b.Navigation("San_Pham");
+
+                    b.Navigation("don_hang");
                 });
 
             modelBuilder.Entity("Ecom.Entity.don_hang", b =>
