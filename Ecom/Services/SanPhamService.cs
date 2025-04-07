@@ -213,9 +213,13 @@ namespace Ecom.Services
                     dataQuery = dataQuery.Where(x => x.ten_san_pham.Contains(request.keySearch));
                 }
 
-                if(request.khoang_gia_tu != null && request.khoang_gia_den != null)
+                if (request.khoang_gia_tu != null && request.khoang_gia_den != null)
                 {
-                    dataQuery = dataQuery.Where(x => x.gia > request.khoang_gia_tu && x.gia < request.khoang_gia_den);
+                    dataQuery = dataQuery.Where(x =>
+                        x.khuyen_mai == null
+                            ? (x.gia > request.khoang_gia_tu && x.gia < request.khoang_gia_den) // Nếu không có khuyến mãi, so sánh theo giá
+                            : (x.khuyen_mai > request.khoang_gia_tu && x.khuyen_mai < request.khoang_gia_den) // Nếu có khuyến mãi, so sánh theo khuyến mãi
+                    );
                 }
 
                 if (request.fromDate != null && request.toDate != null)

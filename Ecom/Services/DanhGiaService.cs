@@ -87,15 +87,15 @@ namespace Ecom.Services
                     {
                         id = x.id,
                         account_id = x.account_id,
-                        ten_khach_hang = _context.account.FirstOrDefault(ac => ac.id == x.account_id).ten,                       
+                        ten_khach_hang = _context.account.FirstOrDefault(ac => ac.id == x.account_id)!.ten,                       
                         danh_gia_chat_luong = x.danh_gia_chat_luong,
                         ma_san_pham = x.ma_san_pham,
                         noi_dung_danh_gia = x.noi_dung_danh_gia,
                         ngay_danh_gia = x.Created.ToString("dd/MM/yyyy HH") + "h",
                         noi_dung_phan_hoi = x.noi_dung_phan_hoi,
                         san_pham_id = x.san_pham_id,
-                        ten_san_pham = _context.san_pham.FirstOrDefault(sp => sp.ma_san_pham == x.ma_san_pham).ten_san_pham,
-                        ma_don_hang = _context.don_hang.FirstOrDefault(dh => dh.id == x.don_hang_id).ma_don_hang
+                        ten_san_pham = _context.san_pham.FirstOrDefault(sp => sp.ma_san_pham == x.ma_san_pham)!.ten_san_pham,
+                        ma_don_hang = _context.don_hang.FirstOrDefault(dh => dh.id == x.don_hang_id)!.ma_don_hang
                     });
 
                 var result = await PaginatedList<DanhGiaDto>.Create(dataQueryDto, request.pageNumber, request.pageSize);
